@@ -16,19 +16,31 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA   *
  *************************************************************************************/
 
-#ifndef TEST_PLUGIN_H
-#define TEST_PLUGIN_H
+#ifndef CLANGTIDYPREFERENCES_H
+#define CLANGTIDYPREFERENCES_H
 
-#include <QObject>
+#include <interfaces/configpage.h>
 
-class TestClangtidyPlugin : public QObject
+namespace Ui
 {
-    Q_OBJECT
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-
-    void testPlugin();
+class ClangtidySettings;
 };
 
-#endif // TEST_PLUGIN_H
+class ClangtidyPreferences : public KDevelop::ConfigPage
+{
+    Q_OBJECT
+public:
+    explicit ClangtidyPreferences(KDevelop::IPlugin* plugin = nullptr, QWidget* parent = nullptr);
+    ~ClangtidyPreferences() override;
+    QString name() const override;
+    QString fullName() const override;
+    QIcon icon() const override;
+
+public slots:
+    void apply() override;
+
+private:
+    Ui::ClangtidySettings* ui;
+};
+
+#endif

@@ -16,19 +16,50 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA   *
  *************************************************************************************/
 
-#ifndef TEST_PLUGIN_H
-#define TEST_PLUGIN_H
+#include "clangtidypreferences.h"
 
-#include <QObject>
+#include <QVBoxLayout>
 
-class TestClangtidyPlugin : public QObject
+#include "clangtidyconfig.h"
+
+#include "configgroup.h"
+#include "ui_clangtidysettings.h"
+
+using KDevelop::IPlugin;
+using ClangTidy::ConfigGroup;
+
+ClangtidyPreferences::ClangtidyPreferences(IPlugin* plugin, QWidget* parent)
+    : ConfigPage(plugin, ClangtidySettings::self(), parent)
 {
-    Q_OBJECT
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    QWidget* widget = new QWidget(this);
+    ui = new Ui::ClangtidySettings();
+    ui->setupUi(widget);
+    layout->addWidget(widget);
+}
 
-    void testPlugin();
-};
+ClangtidyPreferences::~ClangtidyPreferences()
+{
+    delete ui;
+}
 
-#endif // TEST_PLUGIN_H
+QString ClangtidyPreferences::name() const
+{
+    return i18n("clang-tidy");
+}
+
+QString ClangtidyPreferences::fullName() const
+{
+    return i18n("Configure clang-tidy settings");
+}
+
+QIcon ClangtidyPreferences::icon() const
+{
+    return QIcon::fromTheme(QStringLiteral("kdevelop"));
+}
+
+void ClangtidyPreferences::apply()
+{
+    ConfigGroup projConf = KSharedConfig::openConfig()->group("Clangtidy");
+    projConf.writeEntry(ConfigGroup::ExecutablePath, ui->kcfg_clangtidyPath->text());
+}

@@ -16,61 +16,60 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA   *
  *************************************************************************************/
 
-#ifndef JOB_H
-#define JOB_H
+#ifndef CLANGTIDYGENERICCONFIGPAGE_H_
+#define CLANGTIDYGENERICCONFIGPAGE_H_
 
-#include <outputview/outputexecutejob.h>
-#include <interfaces/iproblem.h>
+#include <QItemSelectionModel>
+#include <QObject>
+#include <QStringListModel>
+#include <interfaces/configpage.h>
+
+#include "configgroup.h"
+
+class QIcon;
+class QStringListModel;
+
+namespace KDevelop
+{
+class IProject;
+}
 
 namespace ClangTidy
 {
+class Plugin;
 
-class Job : public KDevelop::OutputExecuteJob
+namespace Ui
+{
+    class GenericConfig;
+}
+
+class GenericConfigPage : public KDevelop::ConfigPage
 {
     Q_OBJECT
 
 public:
-    struct Parameters
-    {
-        QString executable;
-        QString filePath;
-        QString projectRootDir;
-        QString buildDir;
-        QString checks;
-        
-        QString headerFilter;
-        QString additionals;
-        QString checkSysHeaders;
-        QString dump;
-        QString overrideConfigFile;
-    };
+    GenericConfigPage(KDevelop::IProject* project, QWidget* parent);
+    ~GenericConfigPage() override;
 
-    Job(const Parameters &params, QObject* parent = nullptr);
-    ~Job() override;
+    QString name() const override;
+    void setList(QStringList list);
+    void setActiveChecksReceptorList(QStringList* list);
 
-    void start() override;
+signals:
 
-    QVector<KDevelop::IProblem::Ptr> problems() const;
+public slots:
+    void apply() override;
+    void defaults() override;
+    void reset() override;
 
-protected slots:
-    void postProcessStdout( const QStringList& lines ) override;
-    void postProcessStderr( const QStringList& lines ) override;
-
-    void childProcessExited( int exitCode, QProcess::ExitStatus exitStatus ) override;
-    void childProcessError( QProcess::ProcessError processError ) override;
-
-protected:
-    void buildCommandLine();
-    void processStdoutLines( const QStringList& lines );
-    void processStderrLines( const QStringList& lines );
-
-    QStringList m_standardOutput;
-    QStringList m_xmlOutput;
-    bool mustDumpConfig;
-    Job::Parameters m_parameters;
-
-    QVector<KDevelop::IProblem::Ptr> m_problems;
+private:
+    KDevelop::IProject* m_project;
+    Ui::GenericConfig* ui;
+    QStringList* m_activeChecksReceptor;
+    QStringList m_underlineAvailChecks;
+    QStringListModel* m_availableChecksModel;
+    QItemSelectionModel* m_selectedItemModel;
 };
-
 }
-#endif
+
+#endif /* CLANGTIDYGENERICCONFIGPAGE_H_ */
