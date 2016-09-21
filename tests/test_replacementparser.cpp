@@ -42,7 +42,7 @@ void ReplacementsParserTester::cleanupTestCase()
 
 void ReplacementsParserTester::doTest()
 {
-    ReplacementParser parser("data/plugin.cpp.yaml", "data/plugin.cpp");
+    ReplacementParser parser("data/plugin.cpp.yaml");
     parser.parse();
     auto v = parser.allReplacements();
     QVERIFY(!v.isEmpty());
@@ -106,7 +106,7 @@ void ReplacementsParserTester::doTest()
     QCOMPARE(v[7].range.start().column() + 1, 9);
 
     // testing multibyte chars in source code.
-    ReplacementParser nihonParser("data/nihon_plugin.cpp.yaml", "data/nihon_plugin.cpp");
+    ReplacementParser nihonParser("data/nihon_plugin.cpp");
     nihonParser.parse();
     auto nv = nihonParser.allReplacements();
     QVERIFY(!nv.isEmpty());

@@ -1,4 +1,5 @@
-/**************************************************************************************
+/*
+ * ************************************************************************************
  *    Copyright (C) 2016 by Carlos Nihelton <carlosnsoliveira@gmail.com>               *
  *                                                                                     *
  *    This program is free software; you can redistribute it and/or                    *
@@ -14,51 +15,36 @@
  *    You should have received a copy of the GNU General Public License                *
  *    along with this program; if not, write to the Free Software                      *
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA   *
- ***************************************************************************************/
+ *  ************************************************************************************
+ */
 
-#ifndef CLANGTIDY_REPLACEMENT_H
-#define CLANGTIDY_REPLACEMENT_H
+#ifndef PROBLEMSOLUTIONPARSER_H
+#define PROBLEMSOLUTIONPARSER_H
 
-#include <QFile>
-#include <QRegularExpression>
-#include <QVector>
-#include <boost/utility/string_ref.hpp>
-#include <language/editor/documentrange.h>
-
-#include "debug.h"
-#include "problem.h"
-
+#include "clangtidyparser.h"
+#include "replacementparser.h"
+#include <interfaces/iproblem.h>
 namespace ClangTidy
 {
-
-class ReplacementParser
+class ProblemSolutionParser
 {
-private:
-    size_t currentLine;
-    size_t currentColumn;
-    size_t currentOffset;
-    size_t cReplacements;
-
-    QString m_yamlname;
-    QString m_sourceName;
-    KDevelop::IndexedString i_source;
-    QString m_yamlContent;
-    std::string m_sourceCode;
-    boost::string_ref m_sourceView;
-    static const QRegularExpression regex, check;
-    Fixits all_replacements;
-
-protected:
-    Fixit nextNode(const QRegularExpressionMatch& smatch);
-    KDevelop::DocumentRange composeNextNodeRange(size_t offset, size_t length);
+    using Problems = QVector<KDevelop::IProblem::Ptr>;
 
 public:
-    ReplacementParser() = default;
-    explicit ReplacementParser(const QString& source_file);
-    void setReplacementsFileName(const QString& source_file);
+    ProblemSolutionParser() = default;
+    ProblemSolutionParser(const QStringList& jobStdOut, const QString& yamlFileName);
+    ~ProblemSolutionParser() = default;
+    void addStdOutData(const QStringList& data);
+    void setReplacementsFileName(const QString& yamlFileName);
     void parse();
-    Fixits allReplacements() { return all_replacements; }
+    Problems problemsAndSolutions(){return m_problemsAndSolutions;}
+
+private:
+    QStringList m_standardOutput; // from clang-tidy's job.
+    QString m_replacementsFile; // replacements yaml file.
+    ClangtidyParser m_problemParser;
+    ReplacementParser m_solutionParser;
+    Problems m_problemsAndSolutions;
 };
 }
-
-#endif // CLANGTIDY_REPLACEMENT_H
+#endif // PROBLEMSOLUTIONPARSER_H

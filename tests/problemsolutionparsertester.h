@@ -1,4 +1,5 @@
-/**************************************************************************************
+/*
+ * ************************************************************************************
  *    Copyright (C) 2016 by Carlos Nihelton <carlosnsoliveira@gmail.com>               *
  *                                                                                     *
  *    This program is free software; you can redistribute it and/or                    *
@@ -14,51 +15,22 @@
  *    You should have received a copy of the GNU General Public License                *
  *    along with this program; if not, write to the Free Software                      *
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA   *
- ***************************************************************************************/
+ *  ************************************************************************************
+ */
 
-#ifndef CLANGTIDY_REPLACEMENT_H
-#define CLANGTIDY_REPLACEMENT_H
+#ifndef PROBLEMSOLUTIONPARSERTESTER_H
+#define PROBLEMSOLUTIONPARSERTESTER_H
 
-#include <QFile>
-#include <QRegularExpression>
-#include <QVector>
-#include <boost/utility/string_ref.hpp>
-#include <language/editor/documentrange.h>
+#include <QObject>
 
-#include "debug.h"
-#include "problem.h"
-
-namespace ClangTidy
+class ProblemSolutionParserTester : public QObject
 {
+    Q_OBJECT
+private slots:
+    void initTestCase();
+    void cleanupTestCase();
+    void doTest();
 
-class ReplacementParser
-{
-private:
-    size_t currentLine;
-    size_t currentColumn;
-    size_t currentOffset;
-    size_t cReplacements;
-
-    QString m_yamlname;
-    QString m_sourceName;
-    KDevelop::IndexedString i_source;
-    QString m_yamlContent;
-    std::string m_sourceCode;
-    boost::string_ref m_sourceView;
-    static const QRegularExpression regex, check;
-    Fixits all_replacements;
-
-protected:
-    Fixit nextNode(const QRegularExpressionMatch& smatch);
-    KDevelop::DocumentRange composeNextNodeRange(size_t offset, size_t length);
-
-public:
-    ReplacementParser() = default;
-    explicit ReplacementParser(const QString& source_file);
-    void setReplacementsFileName(const QString& source_file);
-    void parse();
-    Fixits allReplacements() { return all_replacements; }
 };
-}
 
-#endif // CLANGTIDY_REPLACEMENT_H
+#endif // PROBLEMSOLUTIONPARSERTESTER_H

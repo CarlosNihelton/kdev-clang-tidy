@@ -43,15 +43,23 @@ const QRegularExpression ReplacementParser::regex{ (
     QStringLiteral("\\s+\\s+-\\s+FilePath:\\s+(.+\\.cpp)\\s+Offset:\\s+(\\d+)\\s+Length:\\s+"
                    "(\\d+)\\s+ ReplacementText:\\s(.+)")) };
 
-ReplacementParser::ReplacementParser(const QString& yaml_file, const QString& source_file)
-    : currentLine{ 0 }
-    , currentColumn{ 0 }
-    , currentOffset{ 0 }
-    , cReplacements{ 0 }
-    , m_yamlname{ yaml_file }
-    , m_sourceFile{ source_file }
+ReplacementParser::ReplacementParser(const QString& source_file) : currentLine{0}, currentColumn{0}, currentOffset{0}, 
+cReplacements{0}
 {
-    if (m_yamlname.endsWith(".yaml")) {
+    setReplacementsFileName(source_file);
+}
+
+void ReplacementParser::setReplacementsFileName(const QString& source_file)
+{
+    if (!source_file.isEmpty()) {
+        if (source_file.endsWith(".yaml")) {
+            m_yamlname = source_file;
+            m_sourceName = source_file.left(source_file.length() - 5);
+        } else {
+            m_sourceName = source_file;
+            m_yamlname = source_file + ".yaml";
+        }
+
         QFile yaml(m_yamlname);
         yaml.open(QIODevice::ReadOnly);
         m_yamlContent = yaml.readAll();
@@ -61,19 +69,17 @@ ReplacementParser::ReplacementParser(const QString& yaml_file, const QString& so
             m_yamlname.clear();
             m_yamlContent.clear();
         }
-    }
 
-    // TODO: Discover a way to get that from KDevelop.
-    if (m_sourceFile.endsWith(".cpp")) {
-        i_source = IndexedString(m_sourceFile);
-        // See <https://github.com/CarlosNihelton/kdev-clang-tidy/issues/1>
-        std::ifstream cpp;
-        cpp.open(m_sourceFile.toUtf8());
-        std::copy(std::istreambuf_iterator<char>(cpp), std::istreambuf_iterator<char>(),
-                  std::back_insert_iterator<std::string>(m_sourceCode));
-        m_sourceView = boost::string_ref(m_sourceCode);
-        qDebug() << "m_sourceView.length(): " << m_sourceView.length() << '\n';
-        qDebug() << "m_sourceCode.length(): " << m_sourceCode.length() << '\n';
+        // TODO: Discover a way to get that from KDevelop.
+        if (m_sourceName.endsWith(".cpp")) {
+            i_source = KDevelop::IndexedString(m_sourceName);
+            // See <https://github.com/CarlosNihelton/kdev-clang-tidy/issues/1>
+            std::ifstream cpp;
+            cpp.open(m_sourceName.toUtf8());
+            std::copy(std::istreambuf_iterator<char>(cpp), std::istreambuf_iterator<char>(),
+                      std::back_insert_iterator<std::string>(m_sourceCode));
+            m_sourceView = boost::string_ref(m_sourceCode);
+        }
     }
 }
 
@@ -89,11 +95,11 @@ void ReplacementParser::parse()
     }
 }
 
-Replacement ReplacementParser::nextNode(const QRegularExpressionMatch& smatch)
+Fixit ReplacementParser::nextNode(const QRegularExpressionMatch& smatch)
 {
-    Replacement repl;
+    Fixit repl;
 
-    if (smatch.captured(1) != m_sourceFile)
+    if (smatch.captured(1) != m_sourceName)
         return repl; // Parsing output from only one file.
 
     repl.offset = smatch.captured(2).toInt();
@@ -117,9 +123,8 @@ KDevelop::DocumentRange ReplacementParser::composeNextNodeRange(size_t offset, s
 
     range.document = i_source;
     auto sourceView = m_sourceView.substr(currentOffset, offset - currentOffset);
-    qDebug() << "sourceView.length(): " << sourceView.length() << '\n';
     size_t line = 0, col = 0;
-    for (const auto elem : sourceView) {
+    for (auto elem : sourceView) {
         if (elem == char('\n')) {
             ++line;
             col = 0;
@@ -143,10 +148,10 @@ KDevelop::DocumentRange ReplacementParser::composeNextNodeRange(size_t offset, s
     }
 
     sourceView = m_sourceView.substr(offset, length);
-    qDebug() << "sourceView.length(): " << sourceView.length() << '\n';
+
     line = 0;
     col = 0;
-    for (const auto elem : sourceView) {
+    for (const auto& elem : sourceView) {
         if (elem == char('\n')) {
             ++line;
             col = 0;

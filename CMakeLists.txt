@@ -33,11 +33,13 @@ set(kdevclangtidy_PART_SRCS
     src/debug.cpp
     src/job.cpp
     src/plugin.cpp
+    src/problem.cpp
     src/config/configgroup.cpp
     src/config/perprojectconfigpage.cpp
     src/config/clangtidypreferences.cpp
     src/parsers/clangtidyparser.cpp
     src/parsers/replacementparser.cpp
+    src/parsers/problemsolutionparser.cpp
 )
 
 include (cmake/ClangFormatAll.cmake)

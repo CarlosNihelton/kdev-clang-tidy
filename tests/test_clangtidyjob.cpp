@@ -65,14 +65,16 @@ void TestClangtidyJob::testJob()
     QVERIFY(!stdoutOutput.isEmpty());
 
     Job::Parameters jobParams;
+//     jobParams.filePath=QStringLiteral("data/plugin.cpp");
     JobTester jobTester(jobParams);
 
     jobTester.processStdoutLines(stdoutOutput);
     QCOMPARE(jobTester.standardOutput(), stdoutOutput.join('\n'));
 
     jobTester.childProcessExited(0, QProcess::NormalExit);
-    auto problems = jobTester.problems();
-
+    QVector<KDevelop::IProblem::Ptr> problems = jobTester.problems();
+    
+    QVERIFY(!problems.isEmpty());
     QVERIFY(problems[0]->finalLocation().document.str().contains(QStringLiteral("/kdev-clang-tidy/src/plugin.cpp")));
     QVERIFY(
         problems[0]->explanation().startsWith(QStringLiteral("[cppcoreguidelines-pro-bounds-array-to-pointer-decay]")));

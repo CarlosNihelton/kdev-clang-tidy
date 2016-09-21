@@ -16,21 +16,18 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA   *
  *************************************************************************************/
 
+#include "problem.h"
+#include "clangtidyparser.h"
+
 #include <KLocalizedString>
 #include <KMessageBox>
 #include <QApplication>
 #include <QRegularExpression>
 #include <shell/problem.h>
 
-#include "clangtidyparser.h"
-#include "debug.h"
-
 namespace ClangTidy
 {
-using KDevelop::IProblem;
-using KDevelop::DetectedProblem;
-using KDevelop::DocumentRange;
-using KDevelop::IndexedString;
+
 /**
  * Convert the value of <verbose> attribute of <error> element from clangtidy's
  * XML-output to 'good-looking' HTML-version. This is necessary because the
@@ -74,37 +71,36 @@ void ClangtidyParser::parse()
 {
     QRegularExpression regex(QStringLiteral("(\\/.+\\.cpp):(\\d+):(\\d+): (.+): (.+) (\\[.+\\])"));
 
-    for (auto line : m_stdout) {
+    for (const auto& line : m_stdout) {
         auto smatch = regex.match(line);
         if (smatch.hasMatch()) {
-            IProblem::Ptr problem(new DetectedProblem());
-            problem->setSource(IProblem::Plugin);
+            Problem::Ptr problem(new Problem());
+            problem->setSource(KDevelop::IProblem::Plugin);
             problem->setDescription(smatch.captured(5));
             problem->setExplanation(smatch.captured(6) + '\n');
 
-            DocumentRange range;
-            range.document = IndexedString(smatch.captured(1));
+            KDevelop::DocumentRange range;
+            range.document = KDevelop::IndexedString(smatch.captured(1));
             range.setBothColumns(smatch.captured(3).toInt() - 1);
             range.setBothLines(smatch.captured(2).toInt() - 1);
             problem->setFinalLocation(range);
 
             auto sev(smatch.captured(4));
-            IProblem::Severity erity;
+            KDevelop::IProblem::Severity erity;
             if (sev == QStringLiteral("error"))
-                erity = IProblem::Error;
+                erity = KDevelop::IProblem::Error;
             else if (sev == QStringLiteral("warning"))
-                erity = IProblem::Warning;
+                erity = KDevelop::IProblem::Warning;
             else if (sev == QStringLiteral("note"))
-                erity = IProblem::Hint;
+                erity = KDevelop::IProblem::Hint;
             else
-                erity = IProblem::NoSeverity;
+                erity = KDevelop::IProblem::NoSeverity;
             problem->setSeverity(erity);
             m_problems.push_back(problem);
 
         } else if (!m_problems.isEmpty()) {
             auto problem = m_problems.last();
-            line.prepend(problem->explanation() + '\n');
-            problem->setExplanation(line);
+            problem->setExplanation(problem->explanation() + '\n' + line);
         } else
             continue;
     }

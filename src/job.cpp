@@ -22,7 +22,7 @@
 #include <QApplication>
 #include <QRegularExpression>
 
-#include "clangtidyparser.h"
+#include "problemsolutionparser.h"
 #include "debug.h"
 #include "job.h"
 #include <QFile>
@@ -188,10 +188,14 @@ void Job::childProcessExited(int exitCode, QProcess::ExitStatus exitStatus)
         qCDebug(KDEV_CLANGTIDY) << "clangtidy failed, XML output: ";
         qCDebug(KDEV_CLANGTIDY) << m_xmlOutput.join('\n');
     } else {
-        ClangtidyParser parser;
-        parser.addData(m_standardOutput);
+        ProblemSolutionParser parser;
+        parser.addStdOutData(m_standardOutput);
+        parser.setReplacementsFileName(m_parameters.filePath);
         parser.parse();
-        m_problems = parser.problems();
+        m_problems = parser.problemsAndSolutions();
+//         for (auto& p : parser.problems()) {
+//             m_problems.push_back(p);
+//         }
     }
 
     KDevelop::OutputExecuteJob::childProcessExited(exitCode, exitStatus);

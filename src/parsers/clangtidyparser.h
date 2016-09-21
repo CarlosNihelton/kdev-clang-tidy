@@ -19,10 +19,8 @@
 #ifndef _CLANGTIDYPARSER_H_
 #define _CLANGTIDYPARSER_H_
 
-#include <QStack>
-#include <QXmlStreamReader>
-
-#include <interfaces/iproblem.h>
+#include "debug.h"
+#include "problem.h"
 
 namespace ClangTidy
 {
@@ -36,13 +34,13 @@ public:
     explicit ClangtidyParser(QObject* parent = nullptr);
     ~ClangtidyParser();
 
-    QVector<KDevelop::IProblem::Ptr> problems() const { return m_problems; }
+    QVector<Problem::Ptr> problems() { return m_problems; }
 
     void parse();
     void addData(const QStringList& stdoutList) { m_stdout = stdoutList; }
 
 private:
-    QVector<KDevelop::IProblem::Ptr> m_problems;
+    QVector<Problem::Ptr> m_problems;
     QStringList m_stdout;
 };
 } // namespace ClangTidy
