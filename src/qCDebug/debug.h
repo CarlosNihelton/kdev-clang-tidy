@@ -19,18 +19,11 @@
  * 02110-1301, USA.
  */
 
-#ifndef REPLACEMENTSPARSERTESTER_H
-#define REPLACEMENTSPARSERTESTER_H
+#ifndef DEBUG_H
+#define DEBUG_H
 
-#include <QObject>
+#include <QLoggingCategory>
 
-class ReplacementsParserTester : public QObject
-{
-    Q_OBJECT
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void doTest();
-};
+Q_DECLARE_LOGGING_CATEGORY(KDEV_CLANGTIDY)
 
-#endif // REPLACEMENTSPARSERTESTER_H
+#endif // DEBUG_H

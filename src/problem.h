@@ -21,7 +21,7 @@
 #ifndef PROBLEM_H
 #define PROBLEM_H
 
-#include "debug.h"
+#include "qCDebug/debug.h"
 #include <interfaces/iassistant.h>
 #include <language/duchain/problem.h>
 

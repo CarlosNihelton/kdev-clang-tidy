@@ -1,31 +1,36 @@
-/*************************************************************************************
- *  Copyright (C) 2016 by Carlos Nihelton <carlosnsoliveira@gmail.com>               *
- *                                                                                   *
- *  This program is free software; you can redistribute it and/or                    *
- *  modify it under the terms of the GNU General Public License                      *
- *  as published by the Free Software Foundation; either version 2                   *
- *  of the License, or (at your option) any later version.                           *
- *                                                                                   *
- *  This program is distributed in the hope that it will be useful,                  *
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of                   *
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                    *
- *  GNU General Public License for more details.                                     *
- *                                                                                   *
- *  You should have received a copy of the GNU General Public License                *
- *  along with this program; if not, write to the Free Software                      *
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA   *
- *************************************************************************************/
+/*
+ * This file is part of KDevelop
+ *
+ * Copyright 2016 Carlos Nihelton <carlosnsoliveira@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ */
+
+#include "job.h"
+
+#include "parsers/clangtidyparser.h"
+#include "parsers/problemsolutionparser.h"
 
 #include <KLocalizedString>
 #include <KMessageBox>
 #include <KShell>
 #include <QApplication>
-#include <QRegularExpression>
 
-#include "problemsolutionparser.h"
-#include "debug.h"
-#include "job.h"
 #include <QFile>
+#include <QRegularExpression>
 
 namespace ClangTidy
 {
@@ -188,11 +193,13 @@ void Job::childProcessExited(int exitCode, QProcess::ExitStatus exitStatus)
         qCDebug(KDEV_CLANGTIDY) << "clangtidy failed, XML output: ";
         qCDebug(KDEV_CLANGTIDY) << m_xmlOutput.join('\n');
     } else {
-        ProblemSolutionParser parser;
-        parser.addStdOutData(m_standardOutput);
-        parser.setReplacementsFileName(m_parameters.filePath);
+        ClangtidyParser parser;
+        parser.addData(m_standardOutput);
         parser.parse();
-        m_problems = parser.problemsAndSolutions();
+        m_problems = parser.problems();
+//         parser.addStdOutData(m_standardOutput);
+//         parser.setReplacementsFileName(m_parameters.filePath);
+//         m_problems = parser.problemsAndSolutions();
 //         for (auto& p : parser.problems()) {
 //             m_problems.push_back(p);
 //         }
@@ -200,4 +207,4 @@ void Job::childProcessExited(int exitCode, QProcess::ExitStatus exitStatus)
 
     KDevelop::OutputExecuteJob::childProcessExited(exitCode, exitStatus);
 }
-}
+} // namespace ClangTidy

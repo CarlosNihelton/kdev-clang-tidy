@@ -18,19 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include "debug.h"
 
-#ifndef REPLACEMENTSPARSERTESTER_H
-#define REPLACEMENTSPARSERTESTER_H
-
-#include <QObject>
-
-class ReplacementsParserTester : public QObject
-{
-    Q_OBJECT
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void doTest();
-};
-
-#endif // REPLACEMENTSPARSERTESTER_H
+Q_LOGGING_CATEGORY(KDEV_CLANGTIDY, "kdev.clangtidy")

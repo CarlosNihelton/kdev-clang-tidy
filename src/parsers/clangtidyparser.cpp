@@ -1,20 +1,23 @@
-/*************************************************************************************
- *  Copyright (C) 2016 by Carlos Nihelton <carlosnsoliveira@gmail.com>               *
- *                                                                                   *
- *  This program is free software; you can redistribute it and/or                    *
- *  modify it under the terms of the GNU General Public License                      *
- *  as published by the Free Software Foundation; either version 2                   *
- *  of the License, or (at your option) any later version.                           *
- *                                                                                   *
- *  This program is distributed in the hope that it will be useful,                  *
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of                   *
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                    *
- *  GNU General Public License for more details.                                     *
- *                                                                                   *
- *  You should have received a copy of the GNU General Public License                *
- *  along with this program; if not, write to the Free Software                      *
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA   *
- *************************************************************************************/
+/*
+ * This file is part of KDevelop
+ *
+ * Copyright 2016 Carlos Nihelton <carlosnsoliveira@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ */
 
 #include "problem.h"
 #include "clangtidyparser.h"
@@ -24,6 +27,8 @@
 #include <QApplication>
 #include <QRegularExpression>
 #include <shell/problem.h>
+
+#include "clangtidyparser.h"
 
 namespace ClangTidy
 {
@@ -63,10 +68,6 @@ ClangtidyParser::ClangtidyParser(QObject* parent)
 {
 }
 
-ClangtidyParser::~ClangtidyParser()
-{
-}
-
 void ClangtidyParser::parse()
 {
     QRegularExpression regex(QStringLiteral("(\\/.+\\.cpp):(\\d+):(\\d+): (.+): (.+) (\\[.+\\])"));
@@ -86,15 +87,17 @@ void ClangtidyParser::parse()
             problem->setFinalLocation(range);
 
             auto sev(smatch.captured(4));
+
             KDevelop::IProblem::Severity erity;
-            if (sev == QStringLiteral("error"))
+            if (sev == QStringLiteral("error")) {
                 erity = KDevelop::IProblem::Error;
-            else if (sev == QStringLiteral("warning"))
+            } else if (sev == QStringLiteral("warning")) {
                 erity = KDevelop::IProblem::Warning;
-            else if (sev == QStringLiteral("note"))
+            } else if (sev == QStringLiteral("note")) {
                 erity = KDevelop::IProblem::Hint;
-            else
+            } else {
                 erity = KDevelop::IProblem::NoSeverity;
+            }
             problem->setSeverity(erity);
             m_problems.push_back(problem);
 
@@ -105,4 +108,4 @@ void ClangtidyParser::parse()
             continue;
     }
 }
-}
+} // namespace ClangTidy
