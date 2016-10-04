@@ -28,6 +28,7 @@
 #include <interfaces/configpage.h>
 
 #include "config/configgroup.h"
+#include "ui_perprojectconfig.h"
 
 class QIcon;
 class QStringListModel;
@@ -56,15 +57,15 @@ class PerProjectConfigPage : public KDevelop::ConfigPage
 
 public:
     PerProjectConfigPage(KDevelop::IProject* project, QWidget* parent);
-    ~PerProjectConfigPage() override;
+    ~PerProjectConfigPage() = default;
 
     ConfigPageType configPageType() const override;
     QString name() const override;
     QIcon icon() const override;
-    void setList(QStringList list);
-    void setActiveChecksReceptorList(QStringList* list);
+    void setList(const QStringList& list);
 
 signals:
+    void selectedChecksChanged(const QStringList& selectedChecks);
 
 public slots:
     void apply() override;
@@ -72,10 +73,9 @@ public slots:
     void reset() override;
 
 private:
-    KDevelop::IProject* m_project;
-    Ui::PerProjectConfig* ui;
+    QScopedPointer<Ui::PerProjectConfig> ui;
     ConfigGroup m_config;
-    QStringList* m_activeChecksReceptor;
+    QStringList m_selectedChecks;
     QStringList m_underlineAvailChecks;
     QStringListModel* m_availableChecksModel;
     QItemSelectionModel* m_selectedItemModel;

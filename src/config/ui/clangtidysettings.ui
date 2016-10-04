@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ClangtidySettings</class>
- <widget class="QWidget" name="ClangtidySettings">
+ <class>ClangTidySettings</class>
+ <widget class="QWidget" name="ClangTidySettings">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
       <item>
        <layout class="QVBoxLayout" name="pathsLabelsLayout">
         <item>
-         <widget class="QLabel" name="clangtidyLabel">
+         <widget class="QLabel" name="clangTidyLabel">
           <property name="text">
            <string>clang-tidy executable</string>
           </property>
@@ -31,7 +31,7 @@
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <property name="buddy">
-           <cstring>kcfg_clangtidyPath</cstring>
+           <cstring>kcfgClangTidyPath</cstring>
           </property>
          </widget>
         </item>
@@ -40,7 +40,7 @@
       <item>
        <layout class="QVBoxLayout" name="pathsUrlsLayout">
         <item>
-         <widget class="KUrlRequester" name="kcfg_clangtidyPath"/>
+         <widget class="KUrlRequester" name="kcfgClangTidyPath"/>
         </item>
        </layout>
       </item>

@@ -41,7 +41,7 @@ const ConfigGroup::Option ConfigGroup::HeaderFilter{ { "HeaderFilter" }, { "--he
 const ConfigGroup::Option ConfigGroup::LineFilter{ { "LineFilter" }, { "--line-filter=%1" } };
 const ConfigGroup::Option ConfigGroup::ListChecks{ { "ListChecks" }, { "--list-checks" } };
 const ConfigGroup::Option ConfigGroup::CheckSystemHeaders{ { "CheckSystemHeaders" }, { "--system-headers" } };
-const ConfigGroup::OptionArray ConfigGroup::m_allOptions{
+const ConfigGroup::OptionArray ConfigGroup::AllOptions{
     { &ConfigGroup::ExecutablePath, &ConfigGroup::FilePath, &ConfigGroup::BuildPath, &ConfigGroup::AdditionalParameters,
       &ConfigGroup::AnaliseTempDtors, &ConfigGroup::EnabledChecks, &ConfigGroup::UseConfigFile,
       &ConfigGroup::DumpConfig, &ConfigGroup::EnableChecksProfile, &ConfigGroup::ExportFixes, &ConfigGroup::ExtraArgs,

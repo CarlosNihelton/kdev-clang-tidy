@@ -33,44 +33,15 @@ using KDevelop::IProblem;
 using KDevelop::DetectedProblem;
 using KDevelop::DocumentRange;
 using KDevelop::IndexedString;
-/**
- * Convert the value of <verbose> attribute of <error> element from clangtidy's
- * XML-output to 'good-looking' HTML-version. This is necessary because the
- * displaying of the original message is performed without line breaks - such
- * tooltips are uncomfortable to read, and large messages will not fit into the
- * screen.
- *
- * This function put the original message into <html> tag that automatically
- * provides line wrapping by builtin capabilities of Qt library. The source text
- * also can contain tokens '\012' (line break) - they are present in the case of
- * source code examples. In such cases, the entire text between the first and
- * last tokens (i.e. source code) is placed into <pre> tag.
- *
- * @param[in] input the original value of <verbose> attribute
- * @return HTML version for displaying in problem's tooltip
- */
-QString verboseMessageToHtml(const QString& input)
-{
-    QString output(QString("<html>%1</html>").arg(input.toHtmlEscaped()));
 
-    output.replace("\\012", "\n");
-
-    if (output.count('\n') >= 2) {
-        output.replace(output.indexOf('\n'), 1, "<pre>");
-        output.replace(output.lastIndexOf('\n'), 1, "</pre><br>");
-    }
-
-    return output;
-}
-
-ClangtidyParser::ClangtidyParser(QObject* parent)
+ClangTidyParser::ClangTidyParser(QObject* parent)
     : QObject(parent)
 {
 }
 
-void ClangtidyParser::parse()
+void ClangTidyParser::parse()
 {
-    QRegularExpression regex(QStringLiteral("(\\/.+\\.cpp):(\\d+):(\\d+): (.+): (.+) (\\[.+\\])"));
+    QRegularExpression regex(QStringLiteral("(\\/.+\\.[ch]{1,2}[px]{0,2}):(\\d+):(\\d+): (.+): (.+) (\\[.+\\])"));
 
     for (auto line : m_stdout) {
         auto smatch = regex.match(line);
@@ -104,8 +75,9 @@ void ClangtidyParser::parse()
             auto problem = m_problems.last();
             line.prepend(problem->explanation() + '\n');
             problem->setExplanation(line);
-        } else
+        } else {
             continue;
+        }
     }
 }
 } // namespace ClangTidy
