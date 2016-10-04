@@ -30,43 +30,43 @@ using KDevelop::IPlugin;
 using ClangTidy::ConfigGroup;
 using KDevelop::ConfigPage;
 
-ClangtidyPreferences::ClangtidyPreferences(IPlugin* plugin, QWidget* parent)
+ClangTidyPreferences::ClangTidyPreferences(IPlugin* plugin, QWidget* parent)
     : ConfigPage(plugin, ClangtidySettings::self(), parent)
 {
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    QWidget* widget = new QWidget(this);
-    ui = new Ui::ClangtidySettings();
+    auto layout = new QVBoxLayout(this);
+    auto widget = new QWidget(this);
+    ui = new Ui::ClangTidySettings();
     ui->setupUi(widget);
     layout->addWidget(widget);
 }
 
-ClangtidyPreferences::~ClangtidyPreferences()
+ClangTidyPreferences::~ClangTidyPreferences()
 {
     delete ui;
 }
 
-ConfigPage::ConfigPageType ClangtidyPreferences::configPageType() const
+ConfigPage::ConfigPageType ClangTidyPreferences::configPageType() const
 {
     return ConfigPage::AnalyzerConfigPage;
 }
 
-QString ClangtidyPreferences::name() const
+QString ClangTidyPreferences::name() const
 {
     return i18n("clang-tidy");
 }
 
-QString ClangtidyPreferences::fullName() const
+QString ClangTidyPreferences::fullName() const
 {
     return i18n("Configure clang-tidy settings");
 }
 
-QIcon ClangtidyPreferences::icon() const
+QIcon ClangTidyPreferences::icon() const
 {
     return QIcon::fromTheme(QStringLiteral("dialog-ok"));
 }
 
-void ClangtidyPreferences::apply()
+void ClangTidyPreferences::apply()
 {
-    ConfigGroup projConf = KSharedConfig::openConfig()->group("Clangtidy");
-    projConf.writeEntry(ConfigGroup::ExecutablePath, ui->kcfg_clangtidyPath->text());
+    ConfigGroup projConf = KSharedConfig::openConfig()->group("ClangTidy");
+    projConf.writeEntry(ConfigGroup::ExecutablePath, ui->kcfgClangTidyPath->text());
 }

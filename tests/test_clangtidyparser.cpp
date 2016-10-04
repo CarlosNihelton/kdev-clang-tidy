@@ -33,32 +33,32 @@
 using namespace KDevelop;
 using namespace ClangTidy;
 
-void TestClangtidyParser::initTestCase()
+void TestClangTidyParser::initTestCase()
 {
     AutoTestShell::init();
     TestCore::initialize(Core::NoUi);
 }
 
-void TestClangtidyParser::cleanupTestCase()
+void TestClangTidyParser::cleanupTestCase()
 {
     TestCore::shutdown();
 }
 
-void TestClangtidyParser::testParser()
+void TestClangTidyParser::testParser()
 {
     // prepare QStringList from file to be parsed.
-    QFile output_example_file("data/output_example");
-    output_example_file.open(QIODevice::ReadOnly);
-    QTextStream ios(&output_example_file);
-    QStringList clangtidy_example_output;
+    QFile outputExampleFile("data/output_example");
+    outputExampleFile.open(QIODevice::ReadOnly);
+    QTextStream ios(&outputExampleFile);
+    QStringList clangTidyExampleOutput;
     QString line;
     while (ios.readLineInto(&line)) {
-        clangtidy_example_output << line;
+        clangTidyExampleOutput << line;
     }
 
-    QVERIFY(!clangtidy_example_output.isEmpty());
-    ClangTidy::ClangtidyParser parser;
-    parser.addData(clangtidy_example_output);
+    QVERIFY(!clangTidyExampleOutput.isEmpty());
+    ClangTidy::ClangTidyParser parser;
+    parser.addData(clangTidyExampleOutput);
     parser.parse();
 
     const auto problems = parser.problems();
@@ -97,4 +97,4 @@ void TestClangtidyParser::testParser()
     QCOMPARE(p->source(), IProblem::Plugin);
 }
 
-QTEST_GUILESS_MAIN(TestClangtidyParser);
+QTEST_GUILESS_MAIN(TestClangTidyParser);

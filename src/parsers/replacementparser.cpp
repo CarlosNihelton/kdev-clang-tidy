@@ -70,36 +70,36 @@ inline std::pair<size_t, size_t> countOfRowAndColumnToTheEndOfSubstr(boost::stri
 namespace ClangTidy
 {
 
-const QRegularExpression ReplacementParser::check{ QStringLiteral(
+const QRegularExpression ReplacementParser::Check{ QStringLiteral(
     "---\\s+MainSourceFile:\\s+.+\\s+Replacements:(\\s+.+)+\\s\\.\\.\\.") };
 
-const QRegularExpression ReplacementParser::regex{ (
+const QRegularExpression ReplacementParser::Regex{ (
     QStringLiteral("\\s+\\s+-\\s+FilePath:\\s+(.+\\.cpp)\\s+Offset:\\s+(\\d+)\\s+Length:\\s+"
                    "(\\d+)\\s+ ReplacementText:\\s(.+)")) };
 
-ReplacementParser::ReplacementParser(const QString& yaml_file, const QString& source_file)
-    : currentLine{ 0 }
-    , currentColumn{ 0 }
-    , currentOffset{ 0 }
-    , cReplacements{ 0 }
-    , m_yamlname{ yaml_file }
-    , m_sourceFile{ source_file }
+ReplacementParser::ReplacementParser(const QString& yamlFileName, const QString& sourceFileName)
+    : m_currentLine{ 0 }
+    , m_currentColumn{ 0 }
+    , m_currentOffset{ 0 }
+    , m_countOfReplacements{ 0 }
+    , m_yamlName{ yamlFileName }
+    , m_sourceFile{ sourceFileName }
 {
-    if (m_yamlname.endsWith(".yaml")) {
-        QFile yaml(m_yamlname);
+    if (m_yamlName.endsWith(".yaml")) {
+        QFile yaml(m_yamlName);
         yaml.open(QIODevice::ReadOnly);
         m_yamlContent = yaml.readAll();
 
-        auto checkMatch = check.match(m_yamlContent);
+        auto checkMatch = Check.match(m_yamlContent);
         if (!checkMatch.hasMatch()) {
-            m_yamlname.clear();
+            m_yamlName.clear();
             m_yamlContent.clear();
         }
     }
 
     // TODO (CarlosNihelton): Discover a way to get that from KDevelop.
     if (m_sourceFile.endsWith(".cpp")) {
-        i_source = IndexedString(m_sourceFile);
+        m_iSource = IndexedString(m_sourceFile);
         // See <https://github.com/CarlosNihelton/kdev-clang-tidy/issues/1>
         std::ifstream cpp;
         cpp.open(m_sourceFile.toUtf8());
@@ -115,10 +115,10 @@ void ReplacementParser::parse()
         return; // Nothing to parse.
     }
 
-    for (auto iMatch = regex.globalMatch(m_yamlContent); iMatch.hasNext(); ++cReplacements) {
+    for (auto iMatch = Regex.globalMatch(m_yamlContent); iMatch.hasNext(); ++m_countOfReplacements) {
         auto smatch = iMatch.next();
         auto rep = nextNode(smatch);
-        all_replacements.push_back(rep);
+        m_allReplacements.push_back(rep);
     }
 }
 
@@ -151,45 +151,45 @@ Replacement ReplacementParser::nextNode(const QRegularExpressionMatch& smatch)
 
 KDevelop::DocumentRange ReplacementParser::composeNextNodeRange(size_t offset, size_t length)
 {
-    qDebug() << "count: " << cReplacements << "\toffset: " << offset << "\tlength: " << length << '\n';
+    qDebug() << "count: " << m_countOfReplacements << "\toffset: " << offset << "\tlength: " << length << '\n';
     KDevelop::DocumentRange range{ KDevelop::IndexedString(), KTextEditor::Range::invalid() };
     /// See https://github.com/CarlosNihelton/kdev-clang-tidy/issues/2.
     if (offset < 1 || offset + length >= m_sourceView.length()) {
         return range;
     }
 
-    range.document = i_source;
-    auto sourceView = m_sourceView.substr(currentOffset, offset - currentOffset);
+    range.document = m_iSource;
+    auto sourceView = m_sourceView.substr(m_currentOffset, offset - m_currentOffset);
 
     auto pos = ::countOfRowAndColumnToTheEndOfSubstr(sourceView);
 
     if (pos.first == 0) {
-        currentColumn += pos.second;
+        m_currentColumn += pos.second;
     } else {
-        currentColumn = pos.second;
+        m_currentColumn = pos.second;
     }
-    currentLine += pos.first;
-    currentOffset = offset;
+    m_currentLine += pos.first;
+    m_currentOffset = offset;
 
     if (length == 0) {
-        range.setBothColumns(currentColumn);
-        range.setBothLines(currentLine);
+        range.setBothColumns(m_currentColumn);
+        range.setBothLines(m_currentLine);
         return range;
     }
 
     sourceView = m_sourceView.substr(offset, length);
     pos = ::countOfRowAndColumnToTheEndOfSubstr(sourceView);
 
-    KTextEditor::Cursor start(currentLine, currentColumn);
+    KTextEditor::Cursor start(m_currentLine, m_currentColumn);
 
     size_t endCol;
     if (pos.first == 0) {
-        endCol = currentColumn + pos.second;
+        endCol = m_currentColumn + pos.second;
     } else {
         endCol = pos.second;
     }
 
-    KTextEditor::Cursor end(currentLine + pos.first, endCol);
+    KTextEditor::Cursor end(m_currentLine + pos.first, endCol);
 
     range.setRange(start, end);
 

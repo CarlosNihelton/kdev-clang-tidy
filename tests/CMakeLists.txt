@@ -24,7 +24,12 @@ ecm_add_test(   test_clangtidyjob.cpp
                 )
 
 # TODO: Discover how to test the plugin class.
-# ecm_add_test(test_plugin.cpp ${PROJECT_SOURCE_DIR}/src/plugin.cpp ${PROJECT_SOURCE_DIR}/src/job.cpp 
-# ${PROJECT_SOURCE_DIR}/src/debug.cpp
-#     TEST_NAME test_clangtidyplugin
-#     LINK_LIBRARIES Qt5::Test KDev::Tests)
+# ecm_add_test(   test_plugin.cpp 
+#                 ../src/plugin/plugin.cpp 
+#                 ../src/plugin/job.cpp 
+#                 ../src/parsers/clangtidyparser.cpp
+#                 ../src/parsers/replacementparser.cpp
+#                 ../src/qCDebug/debug.cpp
+#                 TEST_NAME test_clangtidyplugin
+#                 LINK_LIBRARIES Qt5::Test KDev::Tests
+#                 )

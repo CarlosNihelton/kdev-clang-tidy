@@ -25,8 +25,8 @@ find_program(CLANG_TIDY_EXEC NAMES "clang-tidy")
 if(NOT CLANG_TIDY_EXEC)
     message(ERROR "clang-tidy program not found")
 else()
-    configure_file("${PROJECT_SOURCE_DIR}/src/plugin/plugin.h.in" 
-                   "${PROJECT_SOURCE_DIR}/src/plugin/plugin.h"    )
+    configure_file("${PROJECT_SOURCE_DIR}/src/config/configgroup.h.in" 
+                   "${PROJECT_SOURCE_DIR}/src/config/configgroup.h"    )
                    
     configure_file("${PROJECT_SOURCE_DIR}/res/clangtidyconfig.kcfg.in" 
                    "${PROJECT_SOURCE_DIR}/res/clangtidyconfig.kcfg"    )                   

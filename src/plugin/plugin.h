@@ -56,7 +56,7 @@ class Plugin : public KDevelop::IPlugin
     Q_OBJECT
 
 public:
-    Plugin(QObject* parent, const QVariantList& = QVariantList());
+    Plugin(QObject* parent, const QVariantList& /* unused */ = QVariantList());
     ~Plugin() = default;
     void unload() override;
     KDevelop::ContextMenuExtension contextMenuExtension(KDevelop::Context* context) override;
@@ -84,16 +84,17 @@ protected:
      * \function
      * \brief collects all available checks by running clang-tidy with the following parameters: "--checks=*
      * --list-checks".
-     * \param clangtidyPath QString - the system path for the clang-tidy program.
+     * \param clangTidyPath QString - the system path for the clang-tidy program.
      */
-    void collectAllAvailableChecks(QString clangtidyPath);
+    void collectAllAvailableChecks(QString clangTidyPath);
 
 private slots:
     void loadOutput();
-    void runClangtidy(bool allFiles);
-    void runClangtidyFile();
-    void runClangtidyAll();
+    void runClangTidy(bool allFiles);
+    void runClangTidyFile();
+    void runClangTidyAll();
     void result(KJob* job);
+    void setSelectedChecks(const QStringList& selectedChecks) { m_activeChecks = selectedChecks; }
 
 private:
     ConfigGroup m_config;

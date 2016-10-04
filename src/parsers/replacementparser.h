@@ -53,25 +53,25 @@ using Replacements = QVector<Replacement>;
 class ReplacementParser
 {
 private:
-    size_t currentLine; ///< current line on source code while parsing.
-    size_t currentColumn; ///< current column on source code while parsing.
-    size_t currentOffset; ///< current offset in bytes since the beginning of the source code while parsing.
-    size_t cReplacements; ///< current count of replacements parsed.
+    size_t m_currentLine; ///< current line on source code while parsing.
+    size_t m_currentColumn; ///< current column on source code while parsing.
+    size_t m_currentOffset; ///< current offset in bytes since the beginning of the source code while parsing.
+    size_t m_countOfReplacements; ///< current count of replacements parsed.
 
-    QString m_yamlname;
+    QString m_yamlName;
     QString m_sourceFile;
-    IndexedString i_source;
+    IndexedString m_iSource;
     QString m_yamlContent;
     std::string m_sourceCode;
     boost::string_ref m_sourceView;
-    static const QRegularExpression regex, check;
-    Replacements all_replacements;
+    static const QRegularExpression Regex, Check;
+    Replacements m_allReplacements;
 
 protected:
     /**
     * \function
     * \brief generates the next replacement from the regex capture list.
-    * \param smatch: the captured match.
+    * \param smatch the captured match.
     * \return Replacement
     */
     Replacement nextNode(const QRegularExpressionMatch& smatch);
@@ -86,10 +86,10 @@ protected:
 
 public:
     ReplacementParser() = default;
-    explicit ReplacementParser(const QString& yaml_file, const QString& source_file);
+    explicit ReplacementParser(const QString& yamlFileName, const QString& sourceFileName);
     void parse();
-    size_t count() const { return cReplacements; }
-    Replacements allReplacements() { return all_replacements; }
+    size_t count() const { return m_countOfReplacements; }
+    Replacements allReplacements() { return m_allReplacements; }
 };
 }
 

@@ -75,7 +75,6 @@ protected slots:
     void postProcessStderr(const QStringList& lines) override;
 
     void childProcessExited(int exitCode, QProcess::ExitStatus exitStatus) override;
-    void childProcessError(QProcess::ProcessError processError) override;
 
 protected:
     void buildCommandLine();
@@ -83,8 +82,7 @@ protected:
     void processStderrLines(const QStringList& lines);
 
     QStringList m_standardOutput;
-    QStringList m_xmlOutput;
-    bool mustDumpConfig;
+    bool m_mustDumpConfig;
     Job::Parameters m_parameters;
 
     QVector<KDevelop::IProblem::Ptr> m_problems;
