@@ -17,6 +17,7 @@
     "GenericName[uk]": "Перевірка синтаксису", 
     "GenericName[x-test]": "xxSyntax checkxx", 
     "KPlugin": {
+        "Category": "Analyzers",
         "Authors": [
             {
                 "Name": "Carlos Nihelton", 

@@ -19,30 +19,20 @@
  * 02110-1301, USA.
  */
 
-#include "config/clangtidypreferences.h"
-#include "clangtidyconfig.h"
-#include "config/configgroup.h"
+#include "clangtidypreferences.h"
 #include "ui_clangtidysettings.h"
-
-#include <QVBoxLayout>
+#include "clangtidysettings.h"
 
 using KDevelop::IPlugin;
-using ClangTidy::ConfigGroup;
 using KDevelop::ConfigPage;
 
-ClangTidyPreferences::ClangTidyPreferences(IPlugin* plugin, QWidget* parent)
-    : ConfigPage(plugin, ClangtidySettings::self(), parent)
-{
-    auto layout = new QVBoxLayout(this);
-    auto widget = new QWidget(this);
-    ui = new Ui::ClangTidySettings();
-    ui->setupUi(widget);
-    layout->addWidget(widget);
-}
+namespace ClangTidy{
 
-ClangTidyPreferences::~ClangTidyPreferences()
+ClangTidyPreferences::ClangTidyPreferences(IPlugin* plugin, QWidget* parent)
+    : ConfigPage(plugin, ClangTidySettings::self(), parent)
 {
-    delete ui;
+    Ui::ClangTidySettings ui;
+    ui.setupUi(this);
 }
 
 ConfigPage::ConfigPageType ClangTidyPreferences::configPageType() const
@@ -65,8 +55,4 @@ QIcon ClangTidyPreferences::icon() const
     return QIcon::fromTheme(QStringLiteral("dialog-ok"));
 }
 
-void ClangTidyPreferences::apply()
-{
-    ConfigGroup projConf = KSharedConfig::openConfig()->group("ClangTidy");
-    projConf.writeEntry(ConfigGroup::ExecutablePath, ui->kcfgClangTidyPath->text());
-}
+} // namespace ClangTidy

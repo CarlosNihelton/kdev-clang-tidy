@@ -25,11 +25,15 @@ find_program(CLANG_TIDY_EXEC NAMES "clang-tidy")
 if(NOT CLANG_TIDY_EXEC)
     message(ERROR "clang-tidy program not found")
 else()
+
     configure_file("${PROJECT_SOURCE_DIR}/src/config/configgroup.h.in" 
-                   "${PROJECT_SOURCE_DIR}/src/config/configgroup.h"    )
-                   
-    configure_file("${PROJECT_SOURCE_DIR}/res/clangtidyconfig.kcfg.in" 
-                   "${PROJECT_SOURCE_DIR}/res/clangtidyconfig.kcfg"    )                   
+                    "${PROJECT_SOURCE_DIR}/src/config/configgroup.h"    )
+
+    configure_file("${PROJECT_SOURCE_DIR}/res/clangtidysettings.kcfg.in" 
+                   "${PROJECT_SOURCE_DIR}/res/clangtidysettings.kcfg"    )
+
+    configure_file("${PROJECT_SOURCE_DIR}/res/perprojectsettings.kcfg.in" 
+                   "${PROJECT_SOURCE_DIR}/res/perprojectsettings.kcfg"    )
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
@@ -56,7 +60,8 @@ ki18n_wrap_ui(  kdevclangtidy_PART_SRCS  ${kdevclangtidy_PART_UI}
                 src/config/ui/clangtidysettings.ui
                 src/config/ui/perprojectconfig.ui
                 )
-kconfig_add_kcfg_files(kdevclangtidy_PART_SRCS res/clangtidyconfig.kcfgc)
+kconfig_add_kcfg_files(kdevclangtidy_PART_SRCS res/clangtidysettings.kcfgc)
+kconfig_add_kcfg_files(kdevclangtidy_PART_SRCS res/perprojectsettings.kcfgc)
 kdevplatform_add_plugin(kdevclangtidy JSON res/kdevclangtidy.json SOURCES 
 ${kdevclangtidy_PART_SRCS} ${kdevclangtidy_CONFIG_SRCS})
 target_link_libraries(kdevclangtidy

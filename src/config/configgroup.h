@@ -33,13 +33,13 @@ namespace ClangTidy
 /**
  * \class
  * \brief Specializes KConfigGroup for clang-tidy, using a type system to avoid
- * configuration control by passing strings around.
+ * configuration control by passing
+ * strings around.
  */
 class ConfigGroup
 {
-    //\typedef Typedef for pair of QStrings.
     using Option = std::pair<QString, QString>;
-    ///\typedef definition of an array of options.
+    
     using OptionArray = std::array<const Option*, 18>;
 
 private:
@@ -78,22 +78,15 @@ public:
     static const Option CheckSystemHeaders;
     static const OptionArray AllOptions;
 
-    QString readEntry(const Option& key) const { return m_group.readEntry(key.first); }
-
-    template <typename T>
-    void writeEntry(const Option& key, const T& value, KConfig::WriteConfigFlags pFlags = KConfig::Normal)
-    {
-        m_group.writeEntry(key.first, key.second.arg(value), pFlags);
-    }
-
-    void deleteEntry(const Option& key, KConfig::WriteConfigFlags pFlags = KConfig::Normal)
-    {
-        m_group.deleteEntry(key.first, pFlags);
-    }
-
-    void enableEntry(const Option& key, bool enable)
-    {
-        enable ? writeEntry(key, QStringLiteral("")) : deleteEntry(key);
+    QString readEntry(const Option& key) const { 
+        QString read(m_group.readEntry(key.first));
+        if(read==QStringLiteral("true")){
+            return key.second;
+        } else if(read == QStringLiteral("false") || read.isEmpty()){
+            return QString();
+        } else {
+            return key.second.arg(read); 
+        }
     }
 };
 }

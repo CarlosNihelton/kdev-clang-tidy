@@ -26,9 +26,9 @@ namespace ClangTidy
 const ConfigGroup::Option ConfigGroup::ExecutablePath{ { "ExecutablePath" }, { "%1" } };
 const ConfigGroup::Option ConfigGroup::FilePath{ { "FilePath" }, { "%1" } };
 const ConfigGroup::Option ConfigGroup::BuildPath{ { "BuildPath" }, { "--p=%1%2" } };
-const ConfigGroup::Option ConfigGroup::AdditionalParameters{ { "AdditionalParameters" }, { "%1" } };
+const ConfigGroup::Option ConfigGroup::AdditionalParameters{ { "AdditionalParameters" }, { "--additional-parameters=%1" } };
 const ConfigGroup::Option ConfigGroup::AnaliseTempDtors{ { "AnaliseTempDtors" }, { "--analyze-temporary-dtors" } };
-const ConfigGroup::Option ConfigGroup::EnabledChecks{ { "Checks" }, { "%1" } };
+const ConfigGroup::Option ConfigGroup::EnabledChecks{ { "EnabledChecks" }, { "%1" } };
 const ConfigGroup::Option ConfigGroup::UseConfigFile{ { "UseConfigFile" }, { "--config=" } };
 const ConfigGroup::Option ConfigGroup::DumpConfig{ { "DumpConfigToFile" }, { "--dump-config" } };
 const ConfigGroup::Option ConfigGroup::EnableChecksProfile{ { "EnableChecksProfile" }, { "--enable-check-profile" } };

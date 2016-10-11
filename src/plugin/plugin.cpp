@@ -61,27 +61,21 @@ K_PLUGIN_FACTORY_WITH_JSON(ClangTidyFactory, "res/kdevclangtidy.json", registerP
 namespace ClangTidy
 {
 Plugin::Plugin(QObject* parent, const QVariantList& /*unused*/)
-    : IPlugin("kdevclangtidy", parent)
-    , m_model(new KDevelop::ProblemModel(parent))
+    : IPlugin("kdevclangtidy", parent),
+    m_model(new KDevelop::ProblemModel(parent))
 {
     qCDebug(KDEV_CLANGTIDY) << "setting clangTidy rc file";
     setXMLFile("kdevclangtidy.rc");
+
+    m_model->setFeatures(
+        KDevelop::ProblemModel::SeverityFilter |
+        KDevelop::ProblemModel::Grouping |
+        KDevelop::ProblemModel::CanByPassScopeFilter);
 
     QAction* actionCheckFile;
     actionCheckFile = actionCollection()->addAction("clangTidy_file", this, SLOT(runClangTidyFile()));
     actionCheckFile->setStatusTip(i18n("Launches ClangTidy for current file"));
     actionCheckFile->setText(i18n("clang-tidy"));
-
-    /*     TODO(coliveira): Uncomment this only when discover a safe way to run clang-tidy on
-    the whole project.
-    //     QAction* actionCheckAllFiles;
-    //     actionCheckAllFiles = actionCollection()->addAction ( "clangTidy_all",
-    this, SLOT ( runClangTidyAll() ) );
-    //     actionCheckAllFiles->setStatusTip ( i18n ( "Launches clangTidy for all
-    translation "
-    //                                         "units of current project" ) );
-    //     actionCheckAllFiles->setText ( i18n ( "clang-tidy (all)" ) );
-    */
 
     IExecutePlugin* iface = KDevelop::ICore::self()
                                 ->pluginController()
@@ -95,26 +89,23 @@ Plugin::Plugin(QObject* parent, const QVariantList& /*unused*/)
     m_config = KSharedConfig::openConfig()->group("ClangTidy");
     auto clangTidyPath = m_config.readEntry(ConfigGroup::ExecutablePath);
 
-    // TODO(coliveira): auto detect clang-tidy executable instead of hard-coding it.
-    // Done: var CLANG_TIDY_PATH is set from CMake.
     if (clangTidyPath.isEmpty()) {
         clangTidyPath = QString(CLANG_TIDY_PATH);
     }
 
     collectAllAvailableChecks(clangTidyPath);
 
-    m_config.writeEntry(ConfigGroup::AdditionalParameters, "");
-    for (auto check : m_allChecks) {
-        bool enable = check.contains("cert") || check.contains("-core.") || check.contains("-cplusplus")
-            || check.contains("-deadcode") || check.contains("-security") || check.contains("cppcoreguide");
-        if (enable) {
-            m_activeChecks << check;
-        } else {
-            m_activeChecks.removeAll(check);
+    QStringList defaults(m_config.readEntry(ConfigGroup::EnabledChecks).remove(QChar('*')).split(','));
+    for (const auto& check : m_allChecks) {
+        for(const auto& enabled : defaults){
+            if(check.contains(enabled)){
+                m_activeChecks << check;
+            } else {
+                m_activeChecks.removeAll(check);
+            }
         }
     }
     m_activeChecks.removeDuplicates();
-    m_config.writeEntry(ConfigGroup::EnabledChecks, m_activeChecks.join(','));
 }
 
 void Plugin::unload()
@@ -184,8 +175,6 @@ void Plugin::runClangTidy(bool allFiles)
 
     params.projectRootDir = project->path().toLocalFile();
 
-    // TODO(coliveira): auto detect clang-tidy executable instead of hard-coding it.
-    // Done: var CLANG_TIDY_PATH is set from CMake.
     if (clangTidyPath.isEmpty()) {
         params.executablePath = QStringLiteral(CLANG_TIDY_PATH);
     } else {
@@ -273,9 +262,8 @@ KDevelop::ConfigPage* Plugin::perProjectConfigPage(int number, const ProjectConf
     if (number != 0) {
         return nullptr;
     }
-    auto config = new PerProjectConfigPage(options.project, parent);
+    auto config = new PerProjectConfigPage(this, options.project, m_allChecks, parent);
     connect(config, &PerProjectConfigPage::selectedChecksChanged, this, &Plugin::setSelectedChecks);
-    config->setList(m_allChecks);
     return config;
 }
 

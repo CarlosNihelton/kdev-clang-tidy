@@ -33,17 +33,15 @@
 #include <interfaces/iuicontroller.h>
 #include <shell/problemmodel.h>
 
-#include "config/configgroup.h"
 #include "qCDebug/debug.h"
+#include "config/configgroup.h"
 
 class KJob;
 
 namespace KDevelop
 {
-class ProblemModel;
+    class ProblemModel;
 }
-
-#define CLANG_TIDY_PATH "/usr/bin/clang-tidy"
 
 namespace ClangTidy
 {
@@ -57,15 +55,20 @@ class Plugin : public KDevelop::IPlugin
 
 public:
     Plugin(QObject* parent, const QVariantList& /* unused */ = QVariantList());
+
     ~Plugin() = default;
+
     void unload() override;
+
     KDevelop::ContextMenuExtension contextMenuExtension(KDevelop::Context* context) override;
+    
     int configPages() const override { return 1; }
     /**
      * \function
      * \return the session configuration page for clang-tidy plugin.
      */
     KDevelop::ConfigPage* configPage(int number, QWidget* parent) override;
+    
     int perProjectConfigPages() const override { return 1; }
     /**
      * \function
@@ -79,6 +82,7 @@ public:
      * parameters.
      */
     QStringList allAvailableChecks() { return m_allChecks; }
+    
 protected:
     /**
      * \function
@@ -97,7 +101,7 @@ private slots:
     void setSelectedChecks(const QStringList& selectedChecks) { m_activeChecks = selectedChecks; }
 
 private:
-    ConfigGroup m_config;
+    ConfigGroup m_config;    
     QScopedPointer<KDevelop::ProblemModel> m_model;
     QStringList m_allChecks;
     QStringList m_activeChecks;

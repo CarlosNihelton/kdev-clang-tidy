@@ -19,37 +19,40 @@
  * 02110-1301, USA.
  */
 
-#include "config/perprojectconfigpage.h"
-
+#include "perprojectconfigpage.h"
 #include <KSharedConfig>
 #include <interfaces/iproject.h>
+#include <QMessageBox>
+#include <algorithm>
 
 namespace ClangTidy
 {
 
-PerProjectConfigPage::PerProjectConfigPage(KDevelop::IProject* project, QWidget* parent)
-    : KDevelop::ConfigPage(nullptr, nullptr, parent)
-    , ui(new Ui::PerProjectConfig())
+PerProjectConfigPage::PerProjectConfigPage(KDevelop::IPlugin* plugin, KDevelop::IProject* project, const QStringList& checks, QWidget* parent)
+    : KDevelop::ConfigPage(plugin, new PerProjectSettings, parent),
+      ui(new Ui::PerProjectConfig()), m_underlineAvailChecks(checks)
 {
+    configSkeleton()->setSharedConfig(project->projectConfiguration());
+    configSkeleton()->load();
+    m_projectSettings = dynamic_cast<PerProjectSettings*>(configSkeleton());
     ui->setupUi(this);
 
     m_availableChecksModel = new QStringListModel();
+    m_availableChecksModel->setStringList(m_underlineAvailChecks);
     ui->checkListView->setModel(m_availableChecksModel);
-
     m_selectedItemModel = new QItemSelectionModel(m_availableChecksModel);
     ui->checkListView->setSelectionModel(m_selectedItemModel);
 
-    m_config = project->projectConfiguration()->group("ClangTidy");
+//     m_config = project->projectConfiguration()->group(configSkeleton()->currentGroup());
+    loadSelectedChecksFromConfig();
+    updateSelectedChecksView();
+
+    connect(m_selectedItemModel, &QItemSelectionModel::selectionChanged, this, &PerProjectConfigPage::changed);
 }
 
 QIcon PerProjectConfigPage::icon() const
 {
-    return QIcon::fromTheme(QStringLiteral("emblem-checked"));
-}
-
-KDevelop::ConfigPage::ConfigPageType PerProjectConfigPage::configPageType() const
-{
-    return ConfigPage::AnalyzerConfigPage;
+    return QIcon::fromTheme(QStringLiteral("dialog-ok"));
 }
 
 QString PerProjectConfigPage::name() const
@@ -57,12 +60,35 @@ QString PerProjectConfigPage::name() const
     return i18n("clang-tidy");
 }
 
-void PerProjectConfigPage::setList(const QStringList& list)
-{
+void PerProjectConfigPage::loadSelectedChecksFromConfig(){
 
-    m_underlineAvailChecks = list;
-    m_availableChecksModel->setStringList(m_underlineAvailChecks);
+    m_selectedChecks.clear();
+    QString fromConfig(m_projectSettings->enabledChecks());
 
+    //In case it's passed patterns ending with *, as supported by clang-tidy, we need to know exactly what checks to 
+    // exhibit as selected in the UI.
+    if(fromConfig.contains('*')){
+        //Copy any element of the collection of available clang-tidy checks if its name starts with any of the 
+        //patterns suggested in the configuration.
+        const QStringList splitted(fromConfig.remove(QChar('*')).split(','));
+        std::copy_if(m_underlineAvailChecks.begin(), m_underlineAvailChecks.end(), 
+                     std::back_inserter(m_selectedChecks),
+
+                    [&splitted](const QString& check){
+                        return std::any_of(splitted.begin(), splitted.end(),
+
+                                            [&check](const QString& selected){
+                                                return check.startsWith(selected);
+                                            });
+                     });
+    } else {
+        m_selectedChecks << fromConfig.split(',');
+    }
+
+    m_selectedChecks.removeDuplicates();
+}
+
+void PerProjectConfigPage::updateSelectedChecksView(){
     for (int i = 0; i < m_availableChecksModel->rowCount(); ++i) {
         QModelIndex index = m_availableChecksModel->index(i, 0);
         if (index.isValid()) {
@@ -75,95 +101,46 @@ void PerProjectConfigPage::setList(const QStringList& list)
     }
 }
 
-void PerProjectConfigPage::apply()
-{
-    // TODO (coliveira): discover a way to set the project folders where user header files
-    // might exist into this option. Right now it only works with manual entry.
-    m_config.writeEntry(ConfigGroup::HeaderFilter, ui->headerFilterText->text());
-    m_config.writeEntry(ConfigGroup::AdditionalParameters, ui->clangTidyParameters->text());
-    m_config.enableEntry(ConfigGroup::CheckSystemHeaders, ui->sysHeadersCheckBox->isChecked());
-    m_config.enableEntry(ConfigGroup::UseConfigFile, !ui->overrideConfigFileCheckBox->isChecked());
-    m_config.enableEntry(ConfigGroup::DumpConfig, ui->dumpCheckBox->isChecked());
-
-    for (int i = 0; i < m_availableChecksModel->rowCount(); ++i) {
-        QModelIndex index = m_availableChecksModel->index(i, 0);
-        if (index.isValid()) {
-            bool isSelected = m_selectedItemModel->isSelected(index);
-            auto check = index.data().toString();
-            if (isSelected) {
-                m_selectedChecks << check;
-            } else {
-                m_selectedChecks.removeAll(check);
-            }
-        }
+void PerProjectConfigPage::joinChecks(){
+    m_selectedChecks.clear();
+    auto selectedList(m_selectedItemModel->selectedIndexes());
+    for(auto const& index : selectedList){
+        m_selectedChecks << index.data(0).toString();
     }
     m_selectedChecks.removeDuplicates();
     if (m_selectedChecks.at(0).isEmpty()) {
         m_selectedChecks.removeFirst();
     }
-    m_config.writeEntry(ConfigGroup::EnabledChecks, m_selectedChecks.join(','));
+
+    ui->kcfg_EnabledChecks->setText(m_selectedChecks.join(','));
+}
+
+void PerProjectConfigPage::apply()
+{
+    joinChecks();
+
+    emit this->changed();
+
+    KDevelop::ConfigPage::apply();
     emit selectedChecksChanged(m_selectedChecks);
+
 }
 
-void PerProjectConfigPage::defaults()
-{
-    bool wasBlocked = signalsBlocked();
-    blockSignals(true);
+void PerProjectConfigPage::defaults(){
+    KDevelop::ConfigPage::defaults();
+    bool restore = m_projectSettings->useDefaults(true);
+    loadSelectedChecksFromConfig();
+    updateSelectedChecksView();
+//     joinChecks();
+    m_projectSettings->useDefaults(restore);
+    emit this->changed();
 
-    m_config.writeEntry(ConfigGroup::ExecutablePath, CLANG_TIDY_PATH);
-
-    // TODO: discover a way to set the project folders where user header files
-    // might exist into this option. Right now it only works with manual entry.
-    m_config.writeEntry(ConfigGroup::HeaderFilter, "");
-    ui->headerFilterText->setText("");
-
-    m_config.writeEntry(ConfigGroup::AdditionalParameters, "");
-    ui->clangTidyParameters->setText(QString(""));
-
-    m_config.writeEntry(ConfigGroup::CheckSystemHeaders, "");
-    ui->sysHeadersCheckBox->setChecked(false);
-
-    m_config.enableEntry(ConfigGroup::UseConfigFile, false);
-    ui->overrideConfigFileCheckBox->setChecked(true);
-    ui->checkListGroupBox->setEnabled(true);
-
-    m_config.enableEntry(ConfigGroup::DumpConfig, true);
-    ui->dumpCheckBox->setChecked(true);
-    ui->checkListGroupBox->setEnabled(true);
-
-    m_config.enableEntry(ConfigGroup::ExportFixes, true);
-    //     ui->autoFixCheckBox->setChecked(true);
-
-    for (int i = 0; i < m_availableChecksModel->rowCount(); ++i) {
-        QModelIndex index = m_availableChecksModel->index(i, 0);
-        if (index.isValid()) {
-            auto check = index.data().toString();
-            bool enable = check.contains("cert") || check.contains("-core.") || check.contains("-cplusplus")
-                || check.contains("-deadcode") || check.contains("-security") || check.contains("cppcoreguide");
-            m_selectedItemModel->select(index, enable ? QItemSelectionModel::Select : QItemSelectionModel::Deselect);
-            if (enable) {
-                m_selectedChecks << check;
-            } else {
-                m_selectedChecks.removeAll(check);
-            }
-        }
-    }
-    m_selectedChecks.removeDuplicates();
-    m_config.writeEntry(ConfigGroup::EnabledChecks, m_selectedChecks.join(','));
-    blockSignals(wasBlocked);
 }
 
-void PerProjectConfigPage::reset()
-{
-    if (!m_config.isValid()) {
-        return;
-    }
-    ui->headerFilterText->setText(m_config.readEntry(ConfigGroup::HeaderFilter).remove("--header-filter="));
-    ui->clangTidyParameters->setText(m_config.readEntry(ConfigGroup::AdditionalParameters));
-    ui->sysHeadersCheckBox->setChecked(!m_config.readEntry(ConfigGroup::CheckSystemHeaders).isEmpty());
-    ui->overrideConfigFileCheckBox->setChecked(m_config.readEntry(ConfigGroup::UseConfigFile).isEmpty());
-    ui->checkListGroupBox->setEnabled(m_config.readEntry(ConfigGroup::UseConfigFile).isEmpty());
-    ui->dumpCheckBox->setChecked(!m_config.readEntry(ConfigGroup::DumpConfig).isEmpty());
+void PerProjectConfigPage::reset(){
+    KDevelop::ConfigPage::reset();
+    loadSelectedChecksFromConfig();
+    updateSelectedChecksView();
 }
 
 } // namespace ClangTidy

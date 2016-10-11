@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <group name="ClangTidy">
+        <entry name="ExecutablePath" key="ExecutablePath" type="String">
+            <default>file://@CLANG_TIDY_EXEC@</default>
+        </entry>
+        <entry name="FilePath" key="FilePath" type="String">
+            <default></default>
+        </entry>
+        <entry name="BuildPath" key="BuildPath" type="String">
+            <default></default>
+        </entry>
+        <entry name="AdditionalParameters" key="AdditionalParameters" type="String">
+            <default></default>
+        </entry>
+        <entry name="AnaliseTempDtors" key="AnaliseTempDtors" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="UseConfigFile" key="UseConfigFile" type="Bool">
+            <default>true</default>
+        </entry>
+        <entry name="DumpConfigToFile" key="DumpConfigToFile" type="Bool">
+            <default>true</default>
+        </entry>
+        <entry name="EnableChecksProfile" key="EnableChecksProfile" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="ExportFixes" key="ExportFixes" type="Bool">
+            <default>true</default>
+        </entry>
+        <entry name="ExtraArgs" key="ExtraArgs" type="String">
+            <default></default>
+        </entry>
+        <entry name="ExtraArgsBefore" key="ExtraArgsBefore" type="String">
+            <default></default>
+        </entry>
+        <entry name="AutoFix" key="AutoFix" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="AutoFixError" key="AutoFixError" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="HeaderFilter" key="HeaderFilter" type="String">
+            <default>.*</default>
+        </entry>
+        <entry name="LineFilter" key="LineFilter" type="String">
+            <default></default>
+        </entry>
+        <entry name="ListChecks" key="ListChecks" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="CheckSystemHeaders" key="CheckSystemHeaders" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="EnabledChecks" key="EnabledChecks" type="String">
+            <default>cert-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*</default>
+        </entry>
+    </group>
+</kcfg>
+

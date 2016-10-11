@@ -33,7 +33,8 @@ namespace ClangTidy
 /**
  * \class
  * \brief Specializes KConfigGroup for clang-tidy, using a type system to avoid
- * configuration control by passing strings around.
+ * configuration control by passing
+ * strings around.
  */
 class ConfigGroup
 {

@@ -1,0 +1,4 @@
+File=clangtidysettings.kcfg
+NameSpace=ClangTidy
+ClassName=ClangTidySettings
+Singleton=true
