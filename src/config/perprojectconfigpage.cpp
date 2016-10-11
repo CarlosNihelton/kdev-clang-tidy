@@ -131,7 +131,6 @@ void PerProjectConfigPage::defaults(){
     bool restore = m_projectSettings->useDefaults(true);
     loadSelectedChecksFromConfig();
     updateSelectedChecksView();
-//     joinChecks();
     m_projectSettings->useDefaults(restore);
     emit this->changed();
 

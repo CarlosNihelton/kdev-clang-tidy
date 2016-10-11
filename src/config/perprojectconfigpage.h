@@ -22,14 +22,13 @@
 #ifndef CLANGTIDY_PERPROJECTCONFIGPAGE_H_
 #define CLANGTIDY_PERPROJECTCONFIGPAGE_H_
 
+#include "perprojectsettings.h"
+#include "ui_perprojectconfig.h"
+
 #include <QItemSelectionModel>
 #include <QObject>
 #include <QStringListModel>
 #include <interfaces/configpage.h>
-
-// #include "configgroup.h"
-#include "perprojectsettings.h"
-#include "ui_perprojectconfig.h"
 
 class QIcon;
 class QStringListModel;
@@ -60,7 +59,6 @@ public:
     PerProjectConfigPage(KDevelop::IPlugin* plugin, KDevelop::IProject* project, const QStringList& checks, QWidget* parent);
     ~PerProjectConfigPage() override = default;
 
-    //ConfigPageType configPageType() const override;
     QString name() const override;
     QIcon icon() const override;
 
@@ -78,7 +76,6 @@ protected:
 private:
     QScopedPointer<Ui::PerProjectConfig> ui;
     PerProjectSettings* m_projectSettings;
-//     ConfigGroup m_config;
     QStringList m_selectedChecks;
     QStringList m_underlineAvailChecks;
     QStringListModel* m_availableChecksModel;

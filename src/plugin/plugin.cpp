@@ -208,7 +208,7 @@ void Plugin::runClangTidy(bool allFiles)
         params.dumpConfig = QString();
     }
     auto job2 = new ClangTidy::Job(params, this);
-    connect(job2, SIGNAL(finished(KJob*)), this, SLOT(result(KJob*)));
+    connect(job2, &Job::finished, this, &Plugin::result);
     core()->runController()->registerJob(job2);
 }
 
@@ -249,9 +249,9 @@ KDevelop::ContextMenuExtension Plugin::contextMenuExtension(KDevelop::Context* c
     if (context->type() == KDevelop::Context::EditorContext) {
         auto mime = doc->mimeType().name();
         if (mime == QLatin1String("text/x-c++src") || mime == QLatin1String("text/x-csrc")) {
-            QAction* action = new QAction(QIcon::fromTheme("dialog-ok"), i18n("Check unit with clang-tidy"), this);
-            connect(action, SIGNAL(triggered(bool)), this, SLOT(runClangTidyFile()));
-            extension.addAction(KDevelop::ContextMenuExtension::ExtensionGroup, action);
+            QAction* action = new QAction(QIcon::fromTheme("dialog-ok"), i18n("clang-tidy"), this);
+            connect(action, &QAction::triggered, this, &Plugin::runClangTidyFile);
+            extension.addAction(KDevelop::ContextMenuExtension::AnalyzeGroup, action);
         }
     }
     return extension;
