@@ -20,16 +20,17 @@
  */
 
 #include "clangtidypreferences.h"
+#include "globalsettings.h"
 #include "ui_clangtidysettings.h"
-#include "clangtidysettings.h"
 
 using KDevelop::IPlugin;
 using KDevelop::ConfigPage;
 
-namespace ClangTidy{
+namespace ClangTidy
+{
 
 ClangTidyPreferences::ClangTidyPreferences(IPlugin* plugin, QWidget* parent)
-    : ConfigPage(plugin, ClangTidySettings::self(), parent)
+    : ConfigPage(plugin, GlobalSettings::self(), parent)
 {
     Ui::ClangTidySettings ui;
     ui.setupUi(this);

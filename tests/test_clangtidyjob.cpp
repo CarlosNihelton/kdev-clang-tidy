@@ -32,7 +32,7 @@ using namespace ClangTidy;
 class JobTester : public Job
 {
 public:
-    JobTester(Job::Parameters params)
+    JobTester(Parameters params)
         : Job(params)
     {
     }
@@ -67,7 +67,8 @@ void TestClangTidyJob::testJob()
     }
     QVERIFY(!stdoutOutput.isEmpty());
 
-    Job::Parameters jobParams;
+    Parameters jobParams;
+    jobParams.setDumpConfig(false);
     JobTester jobTester(jobParams);
 
     jobTester.processStdoutLines(stdoutOutput);

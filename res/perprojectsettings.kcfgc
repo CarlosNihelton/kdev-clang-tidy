@@ -1,3 +1,4 @@
 File=perprojectsettings.kcfg
 NameSpace=ClangTidy
 ClassName=PerProjectSettings
+Mutators=DumpConfigToFile

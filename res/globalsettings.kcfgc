@@ -1,0 +1,4 @@
+File=globalsettings.kcfg
+NameSpace=ClangTidy
+ClassName=GlobalSettings
+Singleton=true

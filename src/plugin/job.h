@@ -22,6 +22,7 @@
 #ifndef JOB_H
 #define JOB_H
 
+#include "config/parameters.h"
 #include "qCDebug/debug.h"
 #include <interfaces/iproblem.h>
 #include <outputview/outputexecutejob.h>
@@ -37,33 +38,7 @@ class Job : public KDevelop::OutputExecuteJob
     Q_OBJECT
 
 public:
-    /**
-     * \class
-     * \brief command line parameters.
-     */
-    struct Parameters {
-        QString projectRootDir;
-        QString executablePath;
-        QString filePath;
-        QString buildDir;
-        QString additionalParameters;
-        QString analiseTempDtors;
-        QString enabledChecks;
-        QString useConfigFile;
-        QString dumpConfig;
-        QString enableChecksProfile;
-        QString exportFixes;
-        QString extraArgs;
-        QString extraArgsBefore;
-        QString autoFix;
-        QString autoFixError;
-        QString headerFilter;
-        QString lineFilter;
-        QString listChecks;
-        QString checkSystemHeaders;
-    };
-
-    Job(const Parameters& params, QObject* parent = nullptr);
+    Job(const Parameters& params);
     ~Job() override;
 
     void start() override;
@@ -83,7 +58,7 @@ protected:
 
     QStringList m_standardOutput;
     bool m_mustDumpConfig;
-    Job::Parameters m_parameters;
+    Parameters m_parameters;
 
     QVector<KDevelop::IProblem::Ptr> m_problems;
 };

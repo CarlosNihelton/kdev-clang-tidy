@@ -21,16 +21,18 @@
 
 #include "perprojectconfigpage.h"
 #include <KSharedConfig>
-#include <interfaces/iproject.h>
 #include <QMessageBox>
 #include <algorithm>
+#include <interfaces/iproject.h>
 
 namespace ClangTidy
 {
 
-PerProjectConfigPage::PerProjectConfigPage(KDevelop::IPlugin* plugin, KDevelop::IProject* project, const QStringList& checks, QWidget* parent)
-    : KDevelop::ConfigPage(plugin, new PerProjectSettings, parent),
-      ui(new Ui::PerProjectConfig()), m_underlineAvailChecks(checks)
+PerProjectConfigPage::PerProjectConfigPage(KDevelop::IPlugin* plugin, KDevelop::IProject* project,
+                                           const QStringList& checks, QWidget* parent)
+    : KDevelop::ConfigPage(plugin, new PerProjectSettings, parent)
+    , ui(new Ui::PerProjectConfig())
+    , m_underlineAvailChecks(checks)
 {
     configSkeleton()->setSharedConfig(project->projectConfiguration());
     configSkeleton()->load();
@@ -43,7 +45,7 @@ PerProjectConfigPage::PerProjectConfigPage(KDevelop::IPlugin* plugin, KDevelop::
     m_selectedItemModel = new QItemSelectionModel(m_availableChecksModel);
     ui->checkListView->setSelectionModel(m_selectedItemModel);
 
-//     m_config = project->projectConfiguration()->group(configSkeleton()->currentGroup());
+    //     m_config = project->projectConfiguration()->group(configSkeleton()->currentGroup());
     loadSelectedChecksFromConfig();
     updateSelectedChecksView();
 
@@ -60,26 +62,24 @@ QString PerProjectConfigPage::name() const
     return i18n("clang-tidy");
 }
 
-void PerProjectConfigPage::loadSelectedChecksFromConfig(){
+void PerProjectConfigPage::loadSelectedChecksFromConfig()
+{
 
     m_selectedChecks.clear();
     QString fromConfig(m_projectSettings->enabledChecks());
 
-    //In case it's passed patterns ending with *, as supported by clang-tidy, we need to know exactly what checks to 
+    // In case it's passed patterns ending with *, as supported by clang-tidy, we need to know exactly what checks to
     // exhibit as selected in the UI.
-    if(fromConfig.contains('*')){
-        //Copy any element of the collection of available clang-tidy checks if its name starts with any of the 
-        //patterns suggested in the configuration.
+    if (fromConfig.contains('*')) {
+        // Copy any element of the collection of available clang-tidy checks if its name starts with any of the
+        // patterns suggested in the configuration.
         const QStringList splitted(fromConfig.remove(QChar('*')).split(','));
-        std::copy_if(m_underlineAvailChecks.begin(), m_underlineAvailChecks.end(), 
-                     std::back_inserter(m_selectedChecks),
+        std::copy_if(m_underlineAvailChecks.begin(), m_underlineAvailChecks.end(), std::back_inserter(m_selectedChecks),
 
-                    [&splitted](const QString& check){
-                        return std::any_of(splitted.begin(), splitted.end(),
+                     [&splitted](const QString& check) {
+                         return std::any_of(splitted.begin(), splitted.end(),
 
-                                            [&check](const QString& selected){
-                                                return check.startsWith(selected);
-                                            });
+                                            [&check](const QString& selected) { return check.startsWith(selected); });
                      });
     } else {
         m_selectedChecks << fromConfig.split(',');
@@ -88,7 +88,8 @@ void PerProjectConfigPage::loadSelectedChecksFromConfig(){
     m_selectedChecks.removeDuplicates();
 }
 
-void PerProjectConfigPage::updateSelectedChecksView(){
+void PerProjectConfigPage::updateSelectedChecksView()
+{
     for (int i = 0; i < m_availableChecksModel->rowCount(); ++i) {
         QModelIndex index = m_availableChecksModel->index(i, 0);
         if (index.isValid()) {
@@ -101,10 +102,11 @@ void PerProjectConfigPage::updateSelectedChecksView(){
     }
 }
 
-void PerProjectConfigPage::joinChecks(){
+void PerProjectConfigPage::joinChecks()
+{
     m_selectedChecks.clear();
     auto selectedList(m_selectedItemModel->selectedIndexes());
-    for(auto const& index : selectedList){
+    for (auto const& index : selectedList) {
         m_selectedChecks << index.data(0).toString();
     }
     m_selectedChecks.removeDuplicates();
@@ -123,20 +125,20 @@ void PerProjectConfigPage::apply()
 
     KDevelop::ConfigPage::apply();
     emit selectedChecksChanged(m_selectedChecks);
-
 }
 
-void PerProjectConfigPage::defaults(){
+void PerProjectConfigPage::defaults()
+{
     KDevelop::ConfigPage::defaults();
     bool restore = m_projectSettings->useDefaults(true);
     loadSelectedChecksFromConfig();
     updateSelectedChecksView();
     m_projectSettings->useDefaults(restore);
     emit this->changed();
-
 }
 
-void PerProjectConfigPage::reset(){
+void PerProjectConfigPage::reset()
+{
     KDevelop::ConfigPage::reset();
     loadSelectedChecksFromConfig();
     updateSelectedChecksView();

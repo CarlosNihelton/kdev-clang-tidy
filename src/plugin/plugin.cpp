@@ -20,7 +20,7 @@
  */
 
 #include "plugin.h"
-
+#include "globalsettings.h"
 #include <QAction>
 #include <QMessageBox>
 
@@ -61,21 +61,21 @@ K_PLUGIN_FACTORY_WITH_JSON(ClangTidyFactory, "res/kdevclangtidy.json", registerP
 namespace ClangTidy
 {
 Plugin::Plugin(QObject* parent, const QVariantList& /*unused*/)
-    : IPlugin("kdevclangtidy", parent),
-    m_model(new KDevelop::ProblemModel(parent))
+    : IPlugin("kdevclangtidy", parent)
+    , m_model(new KDevelop::ProblemModel(parent))
 {
     qCDebug(KDEV_CLANGTIDY) << "setting clangTidy rc file";
     setXMLFile("kdevclangtidy.rc");
 
-    m_model->setFeatures(
-        KDevelop::ProblemModel::SeverityFilter |
-        KDevelop::ProblemModel::Grouping |
-        KDevelop::ProblemModel::CanByPassScopeFilter);
+    m_model->setFeatures(KDevelop::ProblemModel::SeverityFilter | KDevelop::ProblemModel::Grouping
+                         | KDevelop::ProblemModel::CanByPassScopeFilter);
 
-    QAction* actionCheckFile;
-    actionCheckFile = actionCollection()->addAction("clangTidy_file", this, SLOT(runClangTidyFile()));
-    actionCheckFile->setStatusTip(i18n("Launches ClangTidy for current file"));
-    actionCheckFile->setText(i18n("clang-tidy"));
+    m_actionCheckFile = new QAction("clang-tidy", this);
+    m_actionCheckFile->setStatusTip(i18n("Launches ClangTidy for current file"));
+    m_actionCheckFile->setText(i18n("clang-tidy"));
+    connect(m_actionCheckFile, &QAction::triggered, this, &Plugin::runClangTidyFile);
+    //     connect(m_actionCheckFile,SIGNAL(triggered(bool)), this, SLOT(runClangTidyFile(void)));
+    actionCollection()->addAction("clangTidy_file", m_actionCheckFile);
 
     IExecutePlugin* iface = KDevelop::ICore::self()
                                 ->pluginController()
@@ -86,26 +86,13 @@ Plugin::Plugin(QObject* parent, const QVariantList& /*unused*/)
     ProblemModelSet* pms = core()->languageController()->problemModelSet();
     pms->addModel(QStringLiteral("ClangTidy"), m_model.data());
 
-    m_config = KSharedConfig::openConfig()->group("ClangTidy");
-    auto clangTidyPath = m_config.readEntry(ConfigGroup::ExecutablePath);
+    auto clangTidyPath = GlobalSettings::executablePath().toLocalFile();
 
     if (clangTidyPath.isEmpty()) {
         clangTidyPath = QString(CLANG_TIDY_PATH);
     }
 
     collectAllAvailableChecks(clangTidyPath);
-
-    QStringList defaults(m_config.readEntry(ConfigGroup::EnabledChecks).remove(QChar('*')).split(','));
-    for (const auto& check : m_allChecks) {
-        for(const auto& enabled : defaults){
-            if(check.contains(enabled)){
-                m_activeChecks << check;
-            } else {
-                m_activeChecks.removeAll(check);
-            }
-        }
-    }
-    m_activeChecks.removeDuplicates();
 }
 
 void Plugin::unload()
@@ -145,7 +132,7 @@ void Plugin::collectAllAvailableChecks(QString clangTidyPath)
     m_allChecks.removeDuplicates();
 }
 
-void Plugin::runClangTidy(bool allFiles)
+void Plugin::runClangTidy(bool /*allFiles*/)
 {
     KDevelop::IDocument* doc = core()->documentController()->activeDocument();
     if (doc == nullptr) {
@@ -160,54 +147,13 @@ void Plugin::runClangTidy(bool allFiles)
         return;
     }
 
-    m_config = project->projectConfiguration()->group("ClangTidy");
-    if (!m_config.isValid()) {
-        QMessageBox::critical(nullptr, i18n("Error starting ClangTidy"),
-                              i18n("Can't load parameters. They must be set in the "
-                                   "project settings."));
-        return;
-    }
-
-    auto clangTidyPath = m_config.readEntry(ConfigGroup::ExecutablePath);
-    auto buildSystem = project->buildSystemManager();
-
-    Job::Parameters params;
-
-    params.projectRootDir = project->path().toLocalFile();
-
-    if (clangTidyPath.isEmpty()) {
-        params.executablePath = QStringLiteral(CLANG_TIDY_PATH);
-    } else {
-        params.executablePath = clangTidyPath;
-    }
-
-    if (allFiles) {
-        params.filePath = project->path().toUrl().toLocalFile();
-    } else {
-        params.filePath = doc->url().toLocalFile();
-    }
-    params.buildDir = buildSystem->buildDirectory(project->projectItem()).toLocalFile();
-    params.additionalParameters = m_config.readEntry(ConfigGroup::AdditionalParameters);
-    params.analiseTempDtors = m_config.readEntry(ConfigGroup::AnaliseTempDtors);
-    params.enabledChecks = m_activeChecks.join(',');
-    params.useConfigFile = m_config.readEntry(ConfigGroup::UseConfigFile);
-    params.dumpConfig = m_config.readEntry(ConfigGroup::DumpConfig);
-    params.enableChecksProfile = m_config.readEntry(ConfigGroup::EnableChecksProfile);
-    params.exportFixes = m_config.readEntry(ConfigGroup::ExportFixes);
-    params.extraArgs = m_config.readEntry(ConfigGroup::ExtraArgs);
-    params.extraArgsBefore = m_config.readEntry(ConfigGroup::ExtraArgsBefore);
-    params.autoFix = m_config.readEntry(ConfigGroup::AutoFix);
-    params.headerFilter = m_config.readEntry(ConfigGroup::HeaderFilter);
-    params.lineFilter = m_config.readEntry(ConfigGroup::LineFilter);
-    params.listChecks = m_config.readEntry(ConfigGroup::ListChecks);
-    params.checkSystemHeaders = m_config.readEntry(ConfigGroup::CheckSystemHeaders);
-
-    if (!params.dumpConfig.isEmpty()) {
-        auto job = new ClangTidy::Job(params, this);
+    Parameters params(project, doc);
+    if (params.mustDumpToConfigFile()) {
+        auto job = new ClangTidy::Job(params);
         core()->runController()->registerJob(job);
-        params.dumpConfig = QString();
+        params.setDumpConfig(false);
     }
-    auto job2 = new ClangTidy::Job(params, this);
+    auto job2 = new ClangTidy::Job(params);
     connect(job2, &Job::finished, this, &Plugin::result);
     core()->runController()->registerJob(job2);
 }
@@ -243,15 +189,13 @@ void Plugin::result(KJob* job)
 
 KDevelop::ContextMenuExtension Plugin::contextMenuExtension(KDevelop::Context* context)
 {
+    KDevelop::ContextMenuExtension extension;
     KDevelop::IDocument* doc = core()->documentController()->activeDocument();
-    KDevelop::ContextMenuExtension extension = KDevelop::IPlugin::contextMenuExtension(context);
 
     if (context->type() == KDevelop::Context::EditorContext) {
         auto mime = doc->mimeType().name();
         if (mime == QLatin1String("text/x-c++src") || mime == QLatin1String("text/x-csrc")) {
-            QAction* action = new QAction(QIcon::fromTheme("dialog-ok"), i18n("clang-tidy"), this);
-            connect(action, &QAction::triggered, this, &Plugin::runClangTidyFile);
-            extension.addAction(KDevelop::ContextMenuExtension::AnalyzeGroup, action);
+            extension.addAction(KDevelop::ContextMenuExtension::AnalyzeGroup, m_actionCheckFile);
         }
     }
     return extension;

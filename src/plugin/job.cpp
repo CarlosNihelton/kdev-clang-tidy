@@ -33,48 +33,24 @@
 namespace ClangTidy
 {
 
-Job::Job(const Parameters& params, QObject* parent)
-    : KDevelop::OutputExecuteJob(parent)
+Job::Job(const Parameters& params)
+    : KDevelop::OutputExecuteJob(nullptr)
     , m_parameters(params)
 {
+    setToolTitle("ClangTidy");
     setJobName(i18n("clang-tidy output"));
-    m_mustDumpConfig = !(params.dumpConfig.isEmpty());
 
     setCapabilities(KJob::Killable);
     setStandardToolView(KDevelop::IOutputView::TestView);
     setBehaviours(KDevelop::IOutputView::AutoScroll);
+
     setProperties(KDevelop::OutputExecuteJob::JobProperty::DisplayStdout);
     setProperties(KDevelop::OutputExecuteJob::JobProperty::DisplayStderr);
     setProperties(KDevelop::OutputExecuteJob::JobProperty::PostProcessOutput);
 
-    *this << params.executablePath;
+    *this << params.executablePath() << params.commandLine();
 
-    if (params.useConfigFile.isEmpty()) {
-        *this << QString("--checks=%1").arg(params.enabledChecks);
-    } else {
-        *this << params.useConfigFile;
-    }
-    if (!params.exportFixes.isEmpty()) {
-        *this << params.exportFixes + QStringLiteral("%1.yaml").arg(params.filePath);
-    }
-
-    *this << QString("-p=%1").arg(params.buildDir);
-    *this << QString("%1").arg(params.filePath);
-
-    if (!params.headerFilter.isEmpty()) {
-        *this << params.headerFilter;
-    }
-    if (!params.additionalParameters.isEmpty()) {
-        *this << params.additionalParameters;
-    }
-    if (!params.checkSystemHeaders.isEmpty()) {
-        *this << params.checkSystemHeaders;
-    }
-    if (m_mustDumpConfig) {
-        *this << params.dumpConfig;
-    }
-
-    qCDebug(KDEV_CLANGTIDY) << "checking path" << params.filePath;
+    qCDebug(KDEV_CLANGTIDY) << "checking path" << params.filePath();
 }
 
 Job::~Job()
@@ -84,10 +60,10 @@ Job::~Job()
 
 void Job::processStdoutLines(const QStringList& lines)
 {
-    if (!m_mustDumpConfig) {
+    if (!m_parameters.mustDumpToConfigFile()) {
         m_standardOutput << lines;
     } else {
-        QFile file(m_parameters.projectRootDir + "/.clang-tidy");
+        QFile file(m_parameters.projectRootDir() + "/.clang-tidy");
         file.open(QIODevice::WriteOnly);
         QTextStream os(&file);
         os << lines.join('\n');

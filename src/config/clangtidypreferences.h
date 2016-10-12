@@ -24,7 +24,8 @@
 
 #include <interfaces/configpage.h>
 
-namespace ClangTidy{
+namespace ClangTidy
+{
 /**
  * \class
  * \brief Implements the session configuration page for clang-tidy.
@@ -41,7 +42,6 @@ public:
     QString name() const override;
     QString fullName() const override;
     QIcon icon() const override;
-
 };
 
 } // namespace ClangTidy

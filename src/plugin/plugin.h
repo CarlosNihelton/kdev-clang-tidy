@@ -34,13 +34,12 @@
 #include <shell/problemmodel.h>
 
 #include "qCDebug/debug.h"
-#include "config/configgroup.h"
 
 class KJob;
 
 namespace KDevelop
 {
-    class ProblemModel;
+class ProblemModel;
 }
 
 namespace ClangTidy
@@ -61,14 +60,14 @@ public:
     void unload() override;
 
     KDevelop::ContextMenuExtension contextMenuExtension(KDevelop::Context* context) override;
-    
+
     int configPages() const override { return 1; }
     /**
      * \function
      * \return the session configuration page for clang-tidy plugin.
      */
     KDevelop::ConfigPage* configPage(int number, QWidget* parent) override;
-    
+
     int perProjectConfigPages() const override { return 1; }
     /**
      * \function
@@ -82,7 +81,7 @@ public:
      * parameters.
      */
     QStringList allAvailableChecks() { return m_allChecks; }
-    
+
 protected:
     /**
      * \function
@@ -101,7 +100,8 @@ private slots:
     void setSelectedChecks(const QStringList& selectedChecks) { m_activeChecks = selectedChecks; }
 
 private:
-    ConfigGroup m_config;    
+    //     ConfigGroup m_config;
+    QAction* m_actionCheckFile;
     QScopedPointer<KDevelop::ProblemModel> m_model;
     QStringList m_allChecks;
     QStringList m_activeChecks;

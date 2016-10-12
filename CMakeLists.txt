@@ -26,13 +26,13 @@ if(NOT CLANG_TIDY_EXEC)
     message(ERROR "clang-tidy program not found")
 else()
 
-    configure_file("${PROJECT_SOURCE_DIR}/src/config/configgroup.h.in" 
-                    "${PROJECT_SOURCE_DIR}/src/config/configgroup.h"    )
+    configure_file("${PROJECT_SOURCE_DIR}/src/config/parameters.h.in"
+                    "${PROJECT_SOURCE_DIR}/src/config/parameters.h"    )
 
-    configure_file("${PROJECT_SOURCE_DIR}/res/clangtidysettings.kcfg.in" 
-                   "${PROJECT_SOURCE_DIR}/res/clangtidysettings.kcfg"    )
+    configure_file("${PROJECT_SOURCE_DIR}/res/globalsettings.kcfg.in"
+                   "${PROJECT_SOURCE_DIR}/res/globalsettings.kcfg"    )
 
-    configure_file("${PROJECT_SOURCE_DIR}/res/perprojectsettings.kcfg.in" 
+    configure_file("${PROJECT_SOURCE_DIR}/res/perprojectsettings.kcfg.in"
                    "${PROJECT_SOURCE_DIR}/res/perprojectsettings.kcfg"    )
 endif()
 
@@ -43,11 +43,11 @@ include_directories(
     ${kdevclangtidy_SOURCE_DIR}/src
 )
 
-set(kdevclangtidy_PART_SRCS
+set(kdevclangtidy_SRCS
     src/qCDebug/debug.cpp
     src/plugin/job.cpp
     src/plugin/plugin.cpp
-    src/config/configgroup.cpp
+    src/config/parameters.cpp
     src/config/perprojectconfigpage.cpp
     src/config/clangtidypreferences.cpp
     src/parsers/clangtidyparser.cpp
@@ -56,14 +56,25 @@ set(kdevclangtidy_PART_SRCS
 
 include (cmake/ClangFormatAll.cmake)
 
-ki18n_wrap_ui(  kdevclangtidy_PART_SRCS  ${kdevclangtidy_PART_UI} 
+ki18n_wrap_ui(  kdevclangtidy_UI_SRCS
                 src/config/ui/clangtidysettings.ui
                 src/config/ui/perprojectconfig.ui
                 )
-kconfig_add_kcfg_files(kdevclangtidy_PART_SRCS res/clangtidysettings.kcfgc)
-kconfig_add_kcfg_files(kdevclangtidy_PART_SRCS res/perprojectsettings.kcfgc)
-kdevplatform_add_plugin(kdevclangtidy JSON res/kdevclangtidy.json SOURCES 
-${kdevclangtidy_PART_SRCS} ${kdevclangtidy_CONFIG_SRCS})
+
+kconfig_add_kcfg_files( kdevclangtidy_CONFIG_SRCS
+                        res/globalsettings.kcfgc
+                        res/perprojectsettings.kcfgc
+                        )
+
+kdevplatform_add_plugin( kdevclangtidy
+                         JSON
+                          res/kdevclangtidy.json
+                         SOURCES
+                          ${kdevclangtidy_SRCS}
+                          ${kdevclangtidy_UI_SRCS}
+                          ${kdevclangtidy_CONFIG_SRCS}
+                          )
+
 target_link_libraries(kdevclangtidy
     KDev::Interfaces
     KDev::Project

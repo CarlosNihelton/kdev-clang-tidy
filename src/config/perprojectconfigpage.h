@@ -56,7 +56,8 @@ class PerProjectConfigPage : public KDevelop::ConfigPage
     Q_OBJECT
 
 public:
-    PerProjectConfigPage(KDevelop::IPlugin* plugin, KDevelop::IProject* project, const QStringList& checks, QWidget* parent);
+    PerProjectConfigPage(KDevelop::IPlugin* plugin, KDevelop::IProject* project, const QStringList& checks,
+                         QWidget* parent);
     ~PerProjectConfigPage() override = default;
 
     QString name() const override;
@@ -69,10 +70,12 @@ public slots:
     void apply() override;
     void defaults() override;
     void reset() override;
+
 protected:
     void joinChecks();
     void loadSelectedChecksFromConfig();
     void updateSelectedChecksView();
+
 private:
     QScopedPointer<Ui::PerProjectConfig> ui;
     PerProjectSettings* m_projectSettings;

@@ -1,13 +1,13 @@
-file(COPY "${PROJECT_SOURCE_DIR}/tests/data" 
+file(COPY "${PROJECT_SOURCE_DIR}/tests/data"
      DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/")
 
-ecm_add_test(   test_replacementparser.cpp 
+ecm_add_test(   test_replacementparser.cpp
                 ../src/parsers/replacementparser.cpp
                 ../src/qCDebug/debug.cpp
                 TEST_NAME test_replacementparser
                 LINK_LIBRARIES Qt5::Test KDev::Tests
-                )     
-     
+                )
+
 ecm_add_test(   test_clangtidyparser.cpp
                 ../src/parsers/clangtidyparser.cpp
                 ../src/qCDebug/debug.cpp
@@ -15,18 +15,25 @@ ecm_add_test(   test_clangtidyparser.cpp
                 LINK_LIBRARIES Qt5::Test KDev::Tests
                 )
 
+set_source_files_properties(${kdevclangtidy_CONFIG_SRCS} PROPERTIES GENERATED ON)
+
 ecm_add_test(   test_clangtidyjob.cpp
+
                 ../src/plugin/job.cpp
+                ../src/config/parameters.cpp
                 ../src/parsers/clangtidyparser.cpp
                 ../src/qCDebug/debug.cpp
+
+                ${kdevclangtidy_CONFIG_SRCS}
+
                 TEST_NAME test_clangtidyjob
                 LINK_LIBRARIES Qt5::Test KDev::Tests
                 )
 
 # TODO: Discover how to test the plugin class.
-# ecm_add_test(   test_plugin.cpp 
-#                 ../src/plugin/plugin.cpp 
-#                 ../src/plugin/job.cpp 
+# ecm_add_test(   test_plugin.cpp
+#                 ../src/plugin/plugin.cpp
+#                 ../src/plugin/job.cpp
 #                 ../src/parsers/clangtidyparser.cpp
 #                 ../src/parsers/replacementparser.cpp
 #                 ../src/qCDebug/debug.cpp
