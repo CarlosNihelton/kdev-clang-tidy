@@ -45,20 +45,20 @@ Parameters::Parameters(KDevelop::IProject* project, KDevelop::IDocument* documen
 
     m_executablePath = KDevelop::Path(GlobalSettings::executablePath()).toLocalFile();
     m_filePath = (m_doc == nullptr ? m_projectRootPath.toLocalFile() : m_doc->url().toLocalFile());
-    analiseTempDtors = projectSettings.analiseTempDtors();
-    enabledChecks = projectSettings.enabledChecks();
-    useConfigFile = projectSettings.useConfigFile();
-    dumpConfig = projectSettings.dumpConfigToFile();
-    enableChecksProfile = projectSettings.enableChecksProfile();
-    exportFixes = projectSettings.exportFixes();
-    extraArgs = projectSettings.extraArgs();
-    extraArgsBefore = projectSettings.extraArgsBefore();
-    autoFix = projectSettings.autoFix();
-    autoFixError = projectSettings.autoFixError();
-    headerFilter = projectSettings.headerFilter();
-    lineFilter = projectSettings.lineFilter();
-    listChecks = projectSettings.listChecks();
-    checkSystemHeaders = projectSettings.checkSystemHeaders();
+    m_analiseTempDtors = projectSettings.analiseTempDtors();
+    m_enabledChecks = projectSettings.enabledChecks();
+    m_useConfigFile = projectSettings.useConfigFile();
+    m_dumpConfig = projectSettings.dumpConfigToFile();
+    m_enableChecksProfile = projectSettings.enableChecksProfile();
+    m_exportFixes = projectSettings.exportFixes();
+    m_extraArgs = projectSettings.extraArgs();
+    m_extraArgsBefore = projectSettings.extraArgsBefore();
+    m_autoFix = projectSettings.autoFix();
+    m_autoFixError = projectSettings.autoFixError();
+    m_headerFilter = projectSettings.headerFilter();
+    m_lineFilter = projectSettings.lineFilter();
+    m_listChecks = projectSettings.listChecks();
+    m_checkSystemHeaders = projectSettings.checkSystemHeaders();
 
     m_commandLine = composeCommandLine();
 }
@@ -67,78 +67,66 @@ QStringList Parameters::composeCommandLine() const
 {
     QStringList cli;
 
-    if (useConfigFile) {
+    if (m_useConfigFile) {
         cli << QStringLiteral("--config=");
     }
 
-    if (!enabledChecks.isEmpty()) {
-        cli << QString("--checks=%1").arg(enabledChecks);
+    if (!m_enabledChecks.isEmpty()) {
+        cli << QString("--checks=%1").arg(m_enabledChecks);
     }
 
-    if (listChecks) {
+    if (m_listChecks) {
         cli << QStringLiteral("--list-checks");
         return cli;
     }
 
-    if (dumpConfig) {
+    if (m_dumpConfig) {
         cli << QStringLiteral("--dump-config");
         return cli;
     }
 
-    if (analiseTempDtors) {
+    if (m_analiseTempDtors) {
         cli << QString("--analyze-temporary-dtors");
     }
 
-    if (exportFixes) {
+    if (m_exportFixes) {
         cli << QString("--export-fixes=%1.yaml").arg(m_filePath);
     }
 
-    if (autoFix) {
+    if (m_autoFix) {
         cli << QStringLiteral("--fix");
     }
 
-    if (autoFixError) {
+    if (m_autoFixError) {
         cli << QStringLiteral("--fix-errors");
     }
 
-    if (enableChecksProfile) {
+    if (m_enableChecksProfile) {
         cli << QStringLiteral("--enable-check-profile");
     }
 
-    if (checkSystemHeaders) {
+    if (m_checkSystemHeaders) {
         cli << QStringLiteral("--system-headers");
     }
 
-    if (!extraArgs.isEmpty()) {
-        cli << QString("--extra-args=%1").arg(extraArgs);
+    if (!m_extraArgs.isEmpty()) {
+        cli << QString("--extra-args=%1").arg(m_extraArgs);
     }
 
-    if (!extraArgsBefore.isEmpty()) {
-        cli << QString("--extra-args-before=%1").arg(extraArgsBefore);
+    if (!m_extraArgsBefore.isEmpty()) {
+        cli << QString("--extra-args-before=%1").arg(m_extraArgsBefore);
     }
 
-    if (!headerFilter.isEmpty()) {
-        cli << QString("--header-filter=%1").arg(headerFilter);
+    if (!m_headerFilter.isEmpty()) {
+        cli << QString("--header-filter=%1").arg(m_headerFilter);
     }
 
-    if (!lineFilter.isEmpty()) {
-        cli << QString("--line-filter=%1").arg(lineFilter);
+    if (!m_lineFilter.isEmpty()) {
+        cli << QString("--line-filter=%1").arg(m_lineFilter);
     }
 
     cli << QString("--p=%1").arg(m_projectBuildPath.toLocalFile()) << m_filePath;
     return cli;
-}
-
-void Parameters::setDumpConfig(bool value)
-{
-    PerProjectSettings settings;
-    if (m_project != nullptr) {
-        settings.setSharedConfig(m_project->projectConfiguration());
-        settings.load();
-    }
-    dumpConfig = value;
-    settings.setDumpConfigToFile(value);
-    m_commandLine = composeCommandLine();
 }
 
 } // namespace ClangTidy
