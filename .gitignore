@@ -2,6 +2,8 @@
 .vscode
 *kdev4
 .vscode
+*.diff
+*.patch
 *~
 .*~
 build
