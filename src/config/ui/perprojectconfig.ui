@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>566</width>
-    <height>318</height>
+    <width>637</width>
+    <height>270</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -30,13 +30,6 @@
        <string>Available checks</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="kcfg_DumpConfigToFile">
-         <property name="text">
-          <string>Dump active configuration to .clang-tidy file.</string>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="0">
         <widget class="QListView" name="checkListView">
          <property name="editTriggers">
@@ -63,73 +56,28 @@
        <string>Options</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="kcfg_AnaliseTempDtors">
-         <property name="text">
-          <string>Analyze temporary destructors</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
+       <item row="2" column="1">
         <widget class="QCheckBox" name="kcfg_AutoFix">
          <property name="text">
           <string>Apply suggested fixes to sources</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="kcfg_CheckSystemHeaders">
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Check system headers</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
+       <item row="3" column="1">
         <widget class="QCheckBox" name="kcfg_AutoFixError">
          <property name="text">
           <string>Apply fixes even with compilation errors found</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="kcfg_ListChecks">
-         <property name="text">
-          <string>List all enabled checks and exit</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
+       <item row="4" column="1">
         <widget class="QCheckBox" name="kcfg_EnableChecksProfile">
          <property name="text">
           <string>Enable checks profile</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="kcfg_UseConfigFile">
-         <property name="text">
-          <string>Use .clang-tidy configuration file</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QCheckBox" name="kcfg_ExportFixes">
-         <property name="text">
-          <string>Export suggested fixes to .yaml file</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Header Filter regex: </string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
+       <item row="7" column="1">
         <widget class="QLineEdit" name="kcfg_HeaderFilter">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -142,51 +90,79 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>E&amp;xtra Arguments:</string>
-         </property>
-         <property name="buddy">
-          <cstring>kcfg_ExtraArgs</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLineEdit" name="kcfg_ExtraArgs">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'monospace'; color:#000000; background-color:#ffffff;&quot;&gt;Additional argument to append to the compiler command line.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Extra Arg&amp;uments before: </string>
-         </property>
-         <property name="buddy">
-          <cstring>kcfg_ExtraArgs</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QLineEdit" name="kcfg_ExtraArgsBefore">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'monospace'; color:#000000; background-color:#ffffff;&quot;&gt;Additional argument to prepend to the compiler command line.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-       </item>
        <item row="7" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Header Filter regex: </string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="QLineEdit" name="kcfg_LineFilter">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'monospace'; color:#000000; background-color:#ffffff;&quot;&gt;List of files with line ranges to filter the &lt;/span&gt;&lt;span style=&quot; font-family:'monospace';&quot;&gt;warnings.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
         <widget class="QLabel" name="label_8">
          <property name="text">
           <string>Line filter: </string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
-        <widget class="QLineEdit" name="kcfg_LineFilter">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="kcfg_UseConfigFile">
+         <property name="text">
+          <string>Use .clang-tidy configuration file</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="kcfg_DumpConfigToFile">
+         <property name="text">
+          <string>Dump active configuration to .clang-tidy file.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QCheckBox" name="kcfg_AnaliseTempDtors">
+         <property name="text">
+          <string>Analyze temporary destructors</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="kcfg_ListChecks">
+         <property name="text">
+          <string>List all enabled checks and exit</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="kcfg_MatchHeaderOfTU">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'monospace'; color:#000000; background-color:#ffffff;&quot;&gt;List of files with line ranges to filter the &lt;/span&gt;&lt;span style=&quot; font-family:'monospace';&quot;&gt;warnings.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked, it sets --header-filter option to match the header of current translation unit if, there is any.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Match the header of current translation unit.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="kcfg_CheckSystemHeaders">
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>Check system headers</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="kcfg_ExportFixes">
+         <property name="text">
+          <string>Export suggested fixes to .yaml file</string>
          </property>
         </widget>
        </item>
@@ -206,7 +182,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Checks:</string>
+          <string>Active Checks:</string>
          </property>
         </widget>
        </item>
@@ -225,6 +201,40 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>E&amp;xtra Arguments:</string>
+         </property>
+         <property name="buddy">
+          <cstring>kcfg_ExtraArgs</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Extra Arg&amp;uments before: </string>
+         </property>
+         <property name="buddy">
+          <cstring>kcfg_ExtraArgs</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="kcfg_ExtraArgs">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'monospace'; color:#000000; background-color:#ffffff;&quot;&gt;Additional argument to append to the compiler command line.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="kcfg_ExtraArgsBefore">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'monospace'; color:#000000; background-color:#ffffff;&quot;&gt;Additional argument to prepend to the compiler command line.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -232,5 +242,118 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>kcfg_DumpConfigToFile</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>kcfg_ListChecks</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>279</x>
+     <y>165</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>126</x>
+     <y>109</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>kcfg_ListChecks</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>kcfg_DumpConfigToFile</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>126</x>
+     <y>109</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>279</x>
+     <y>165</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>kcfg_MatchHeaderOfTU</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>kcfg_HeaderFilter</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>366</x>
+     <y>165</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>381</x>
+     <y>193</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>kcfg_AutoFix</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>kcfg_ExportFixes</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>392</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>416</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>kcfg_AutoFixError</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>kcfg_ExportFixes</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>444</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>136</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>kcfg_ExportFixes</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>kcfg_AutoFix</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>487</x>
+     <y>139</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>503</x>
+     <y>56</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>kcfg_ExportFixes</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>kcfg_AutoFixError</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>529</x>
+     <y>140</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>519</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

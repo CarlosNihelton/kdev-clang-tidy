@@ -65,6 +65,8 @@ private:
     QString m_extraArgsBefore;
     bool m_autoFix;
     bool m_autoFixError;
+    bool m_matchHeaderOfTU;
+    QString m_headerPattern;
     QString m_headerFilter;
     QString m_lineFilter;
     bool m_listChecks;
@@ -77,7 +79,8 @@ public:
     const QString& filePath()           const {return m_filePath;}
     const QString& executablePath()     const {return m_executablePath;}
     bool mustDumpToConfigFile()         const {return m_dumpConfig;}
-    void setDumpConfig(bool value)            { m_dumpConfig=value; composeCommandLine(); }
+    bool headerFilterMatchesComponent() const {return m_matchHeaderOfTU;}
+    void setDumpConfig(bool value)            {m_dumpConfig=value; m_commandLine=composeCommandLine();}
     QString projectRootDir()            const {return m_projectRootPath.toLocalFile();}
 };
 

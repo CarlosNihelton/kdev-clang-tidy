@@ -31,21 +31,20 @@ namespace ClangTidy
 PerProjectConfigPage::PerProjectConfigPage(KDevelop::IPlugin* plugin, KDevelop::IProject* project,
                                            const QStringList& checks, QWidget* parent)
     : KDevelop::ConfigPage(plugin, new PerProjectSettings, parent)
-    , ui(new Ui::PerProjectConfig())
+    , m_ui(new Ui::PerProjectConfig())
     , m_underlineAvailChecks(checks)
 {
     configSkeleton()->setSharedConfig(project->projectConfiguration());
     configSkeleton()->load();
     m_projectSettings = dynamic_cast<PerProjectSettings*>(configSkeleton());
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
     m_availableChecksModel = new QStringListModel();
     m_availableChecksModel->setStringList(m_underlineAvailChecks);
-    ui->checkListView->setModel(m_availableChecksModel);
+    m_ui->checkListView->setModel(m_availableChecksModel);
     m_selectedItemModel = new QItemSelectionModel(m_availableChecksModel);
-    ui->checkListView->setSelectionModel(m_selectedItemModel);
+    m_ui->checkListView->setSelectionModel(m_selectedItemModel);
 
-    //     m_config = project->projectConfiguration()->group(configSkeleton()->currentGroup());
     loadSelectedChecksFromConfig();
     updateSelectedChecksView();
 
@@ -106,15 +105,16 @@ void PerProjectConfigPage::joinChecks()
 {
     m_selectedChecks.clear();
     auto selectedList(m_selectedItemModel->selectedIndexes());
-    for (auto const& index : selectedList) {
-        m_selectedChecks << index.data(0).toString();
+    if(!selectedList.isEmpty()){
+        for (auto const& index : selectedList) {
+            m_selectedChecks << index.data(0).toString();
+        }
+        m_selectedChecks.removeDuplicates();
+        if (m_selectedChecks.at(0).isEmpty()) {
+            m_selectedChecks.removeFirst();
+        }
     }
-    m_selectedChecks.removeDuplicates();
-    if (m_selectedChecks.at(0).isEmpty()) {
-        m_selectedChecks.removeFirst();
-    }
-
-    ui->kcfg_EnabledChecks->setText(m_selectedChecks.join(','));
+    m_ui->kcfg_EnabledChecks->setText(m_selectedChecks.join(','));
 }
 
 void PerProjectConfigPage::apply()

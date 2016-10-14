@@ -77,7 +77,7 @@ protected:
     void updateSelectedChecksView();
 
 private:
-    QScopedPointer<Ui::PerProjectConfig> ui;
+    QScopedPointer<Ui::PerProjectConfig> m_ui;
     PerProjectSettings* m_projectSettings;
     QStringList m_selectedChecks;
     QStringList m_underlineAvailChecks;

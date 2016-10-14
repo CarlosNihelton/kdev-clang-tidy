@@ -72,7 +72,7 @@ Plugin::Plugin(QObject* parent, const QVariantList& /*unused*/)
 
     m_actionCheckFile = new QAction("clang-tidy", this);
     m_actionCheckFile->setStatusTip(i18n("Launches ClangTidy for current file"));
-    m_actionCheckFile->setText(i18n("clang-tidy"));
+    m_actionCheckFile->setText(i18n("Clang-tidy (Current file)"));
     connect(m_actionCheckFile, &QAction::triggered, this, &Plugin::runClangTidyFile);
     //     connect(m_actionCheckFile,SIGNAL(triggered(bool)), this, SLOT(runClangTidyFile(void)));
     actionCollection()->addAction("clangTidy_file", m_actionCheckFile);

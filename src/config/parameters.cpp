@@ -26,6 +26,7 @@
 #include <interfaces/iproject.h>
 #include <project/interfaces/ibuildsystemmanager.h>
 #include <project/projectmodel.h>
+#include <QFileInfo>
 
 namespace ClangTidy
 {
@@ -55,6 +56,9 @@ Parameters::Parameters(KDevelop::IProject* project, KDevelop::IDocument* documen
     m_extraArgsBefore = projectSettings.extraArgsBefore();
     m_autoFix = projectSettings.autoFix();
     m_autoFixError = projectSettings.autoFixError();
+    m_matchHeaderOfTU = projectSettings.matchHeaderOfTU();
+    QFileInfo fileInfo(m_filePath);
+    m_headerPattern = fileInfo.baseName();
     m_headerFilter = projectSettings.headerFilter();
     m_lineFilter = projectSettings.lineFilter();
     m_listChecks = projectSettings.listChecks();
@@ -117,8 +121,12 @@ QStringList Parameters::composeCommandLine() const
         cli << QString("--extra-args-before=%1").arg(m_extraArgsBefore);
     }
 
-    if (!m_headerFilter.isEmpty()) {
-        cli << QString("--header-filter=%1").arg(m_headerFilter);
+    if(m_matchHeaderOfTU){
+        cli << QString("--header-filter=%1").arg(m_headerPattern);
+    } else {
+        if (!m_headerFilter.isEmpty()) {
+            cli << QString("--header-filter=%1").arg(m_headerFilter);
+        }
     }
 
     if (!m_lineFilter.isEmpty()) {

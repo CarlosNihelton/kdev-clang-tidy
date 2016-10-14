@@ -50,7 +50,7 @@ Job::Job(const Parameters& params)
 
     *this << params.executablePath() << params.commandLine();
 
-    qCDebug(KDEV_CLANGTIDY) << "checking path" << params.filePath();
+    qCDebug(KDEV_CLANGTIDY) << "command line: " << params.commandLine();
 }
 
 Job::~Job()

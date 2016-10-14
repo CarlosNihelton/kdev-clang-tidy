@@ -55,7 +55,7 @@ class Plugin : public KDevelop::IPlugin
 public:
     Plugin(QObject* parent, const QVariantList& /* unused */ = QVariantList());
 
-    ~Plugin() = default;
+    ~Plugin() override = default;
 
     void unload() override;
 

@@ -35,7 +35,7 @@ class ClangTidyParser : public QObject
 {
 public:
     explicit ClangTidyParser(QObject* parent = nullptr);
-    ~ClangTidyParser() = default;
+    ~ClangTidyParser() override = default;
     /**
      * \return all problems collected from clang-tidy stdout.
      */
